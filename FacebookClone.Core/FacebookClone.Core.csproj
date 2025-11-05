@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FacebookClone.Data\FacebookClone.Data.csproj" />
+    <ProjectReference Include="..\FacebookClone.Infrastructure\FacebookClone.Infrastructure.csproj" />
+    <ProjectReference Include="..\FacebookClone.Service\FacebookClone.Service.csproj" />
+  </ItemGroup>
+
+</Project>

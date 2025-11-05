@@ -1,0 +1,17 @@
+﻿//using Microsoft.Extensions.DependencyInjection;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+
+//namespace FacebookClone.Infrastructure
+//{
+//    public static class ModuleInfrastructureDependencies
+//    {
+//        public static IServiceCollection GetServices(this IServiceCollection services)
+//        {
+//            services.AddTransient<>
+//        }
+//    }
+//}

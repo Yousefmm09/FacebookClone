@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="FacebookClone.Core/FacebookClone.Core.csproj" />
+  <Project Path="FacebookClone.Data/FacebookClone.Data.csproj" />
+  <Project Path="FacebookClone.Infrastructure/FacebookClone.Infrastructure.csproj" />
+  <Project Path="FacebookClone.Service/FacebookClone.Service.csproj" />
+  <Project Path="FacebookClone/FacebookClone.Api.csproj" />
+</Solution>
