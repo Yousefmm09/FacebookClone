@@ -1,5 +1,6 @@
 ﻿using FacebookClone.Data.Entities;
 using FacebookClone.Data.Entities.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,12 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Infrastructure.Context
 {
-    public class AppDb:DbContext
+    public class AppDb:IdentityDbContext<User>
     {
+        public AppDb()
+        {
+            
+        }
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostMedia> PostMedia { get; set; }

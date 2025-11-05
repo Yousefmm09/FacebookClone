@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using FacebookClone.Data.Entities.Identity;
+using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Infrastructure.Context;
 using FacebookClone.Infrastructure.Implementations;
 using FacebookClone.Service.Abstract;
@@ -23,8 +24,8 @@ namespace FacebookClone.Service.Implementations
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly RefreshTokenRepository _refreshTokenRepository;
-        public AuthenticationsService(UserManager<User> userManager,IConfiguration configuration,RefreshTokenRepository refreshTokenRepository)
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        public AuthenticationsService(UserManager<User> userManager,IConfiguration configuration,IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _configuration = configuration;

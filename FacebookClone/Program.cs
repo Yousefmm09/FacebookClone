@@ -1,3 +1,4 @@
+using FacebookClone.Core;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure;
 using FacebookClone.Infrastructure.Context;
@@ -18,14 +19,17 @@ builder.Services.AddDbContext<AppDb>(option=>
 });
 builder.Services.AddSwaggerGen();
 builder.Services.AddServicesDependencies()
+    .GetServices().AddCoreDepndencies()
     .AddServiceRegistration(builder.Configuration);
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleSeeder.AddRole(roleManager);
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    await RoleSeeder.SeedAsync(roleManager, userManager);
 }
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

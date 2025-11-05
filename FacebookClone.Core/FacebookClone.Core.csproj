@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FacebookClone.Data\FacebookClone.Data.csproj" />
     <ProjectReference Include="..\FacebookClone.Infrastructure\FacebookClone.Infrastructure.csproj" />
     <ProjectReference Include="..\FacebookClone.Service\FacebookClone.Service.csproj" />
