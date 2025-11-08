@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Service.Abstract
 {
-    public interface IAuthenticationsService
+    public  interface IAuthenticationsService
     {
         public Task<AuthMessage> CreatRefreshToken(string OldAccessToken, string RefreshToekn);
         public Task<AuthMessage> CreateAccessTokenAsync(User user);
         public Task<AuthMessage> ConfirmEmail(string userId,string token);
+        public Task<AuthMessage> ResetPassword(string userId,string token,string NewPassword);
     }
 }

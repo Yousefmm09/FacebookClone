@@ -6,6 +6,7 @@ using FacebookClone.Infrastructure.Context;
 using FacebookClone.Infrastructure.Implementations;
 using FacebookClone.Service.Abstract;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -49,7 +50,24 @@ namespace FacebookClone.Service.Implementations
             return new AuthMessage { Message = "not found user" };
                     
         }
-
+        public async Task<AuthMessage> ResetPassword(string userId, string token, string NewPassword)
+        {
+            var user =  await _userManager.FindByIdAsync(userId);
+            if(user != null)
+            {
+                var decodedBytes = WebEncoders.Base64UrlDecode(token);
+                var decodedToken = Encoding.UTF8.GetString(decodedBytes);
+                var resetpassword= await  _userManager.ResetPasswordAsync(user,decodedToken,NewPassword);
+                if (!resetpassword.Succeeded)
+                {
+                    var error=string.Join(",",resetpassword.Errors.Select(x=>x.Description));
+                    return new AuthMessage { Message=$"{error}"};
+                }
+                else
+                    return new AuthMessage { Message = "the password is  reseted" };
+            }
+            return new AuthMessage { Message = "not found user" };
+        }
         public async Task<AuthMessage> CreateAccessTokenAsync(User user)
         {
             var token= await GenerateJwtToken(user);
