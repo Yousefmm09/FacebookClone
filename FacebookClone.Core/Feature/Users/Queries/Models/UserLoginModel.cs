@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Users.Queries.Models
 {
-    public class UserLoginModel:IRequest<JwtToken>
+    public class UserLoginModel:IRequest<AuthMessage>
     {
         public string Email {  get; set; }
         public string Password { get; set; }

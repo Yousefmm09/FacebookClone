@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Service.Implementations
 {
-    public class JwtToken
+    public class AuthMessage
     {
         public string AccessToken { get; set; }
         public RefreshToken refreshToken { get; set; }

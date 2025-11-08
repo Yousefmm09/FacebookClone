@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using FacebookClone.Data.Entities;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Infrastructure.Context;
@@ -16,7 +17,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using static FacebookClone.Service.Implementations.JwtToken;
+using static FacebookClone.Service.Implementations.AuthMessage;
 
 namespace FacebookClone.Service.Implementations
 {
@@ -31,7 +32,25 @@ namespace FacebookClone.Service.Implementations
             _configuration = configuration;
             _refreshTokenRepository = refreshTokenRepository;   
         }
-        public async Task<JwtToken> CreateAccessTokenAsync(User user)
+
+        public async Task<AuthMessage> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+                if (confirmEmail != null)
+                {
+                    return new AuthMessage { Message = "the email is confirmed" };
+                }
+                else
+                    return new AuthMessage { Message = "the email is confirmed" };
+            }
+            return new AuthMessage { Message = "not found user" };
+                    
+        }
+
+        public async Task<AuthMessage> CreateAccessTokenAsync(User user)
         {
             var token= await GenerateJwtToken(user);
             var rtoken =  CreatRefreshToken(user);
@@ -44,14 +63,14 @@ namespace FacebookClone.Service.Implementations
                 UserId = user.Id
             };
              await _refreshTokenRepository.RefreshToken(jwttoken);
-            return new JwtToken
+            return new AuthMessage
             {
                 AccessToken = token.AccessToken,
                 refreshToken = rtoken,
                 Message = "Tokens generated successfully."
             };
         }
-        public async Task<JwtToken> CreatRefreshToken( string OldAccessToken, string RefreshToekn )
+        public async Task<AuthMessage> CreatRefreshToken( string OldAccessToken, string RefreshToekn )
         {
             var jwttoken= new JwtSecurityTokenHandler().ReadJwtToken(OldAccessToken);
            if(jwttoken==null|| jwttoken.Header.Alg!=SecurityAlgorithms.HmacSha256)
@@ -86,7 +105,7 @@ namespace FacebookClone.Service.Implementations
             };
             await _refreshTokenRepository.RefreshToken(userRToken);
 
-            return new JwtToken
+            return new AuthMessage
             {
                 AccessToken = NewAccessToken.AccessToken,
                 refreshToken = NewRefreshToken,
@@ -105,7 +124,7 @@ namespace FacebookClone.Service.Implementations
                 TokenString= Convert.ToBase64String(random)
             };
         }
-        private async Task<JwtToken> GenerateJwtToken(User user)
+        private async Task<AuthMessage> GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
             // creat sign
@@ -127,7 +146,7 @@ namespace FacebookClone.Service.Implementations
                 signingCredentials: sign
                 );
             var accesstoken = new JwtSecurityTokenHandler().WriteToken(token);
-            return new JwtToken
+            return new AuthMessage
             {
                 AccessToken = accesstoken
             };

@@ -10,7 +10,8 @@ namespace FacebookClone.Service.Abstract
 {
     public interface IAuthenticationsService
     {
-        public Task<JwtToken> CreatRefreshToken(string OldAccessToken, string RefreshToekn);
-        public Task<JwtToken> CreateAccessTokenAsync(User user);
+        public Task<AuthMessage> CreatRefreshToken(string OldAccessToken, string RefreshToekn);
+        public Task<AuthMessage> CreateAccessTokenAsync(User user);
+        public Task<AuthMessage> ConfirmEmail(string userId,string token);
     }
 }

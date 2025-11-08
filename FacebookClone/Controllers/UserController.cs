@@ -1,7 +1,9 @@
-﻿using FacebookClone.Core.Feature.Users.Command.Handlers;
+﻿using FacebookClone.Core.Feature.Authentication.Queries.Models;
+using FacebookClone.Core.Feature.Users.Command.Handlers;
 using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Core.Feature.Users.Queries.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +30,17 @@ namespace FacebookClone.Api.Controllers
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody]UserLoginModel command)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(command);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpGet("ConfirmEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailQuery command)
         {
             if (ModelState.IsValid)
             {
