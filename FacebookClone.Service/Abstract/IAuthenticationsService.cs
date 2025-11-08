@@ -13,9 +13,6 @@ namespace FacebookClone.Service.Abstract
         public Task<AuthMessage> CreatRefreshToken(string OldAccessToken, string RefreshToekn);
         public Task<AuthMessage> CreateAccessTokenAsync(User user);
         public Task<AuthMessage> ConfirmEmail(string userId,string token);
-<<<<<<< HEAD
         public Task<AuthMessage> ResetPassword(string userId,string token,string NewPassword);
-=======
->>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
     }
 }

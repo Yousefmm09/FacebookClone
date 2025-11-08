@@ -17,11 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
-=======
     <Folder Include="Feature\Authentication\Command\Handlers\" />
     <Folder Include="Feature\Authentication\Command\Models\" />
->>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
     <Folder Include="Feature\Email\Queries\Handlers\" />
     <Folder Include="Feature\Email\Queries\Models\" />
     <Folder Include="Feature\Users\Command\Handlers\" />

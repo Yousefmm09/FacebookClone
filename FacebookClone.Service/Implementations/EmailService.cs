@@ -34,15 +34,13 @@ namespace FacebookClone.Service.Implementations
                     HtmlBody = message,
                     TextBody = "FaceBookClone"
                 };
-<<<<<<< HEAD
+
                 var mail = new MimeMessage()
                 {
                     Body = bodyBuilder.ToMessageBody(),
                     Subject = "Facebook Clone"
                 };
-=======
-                var mail = new MimeMessage();
->>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
+
                 mail.From.Add(new MailboxAddress("Facebook Clone", "yousefmohsen232@gmail.com"));
                 mail.To.Add(new MailboxAddress("", email));
                 mail.Subject = message;

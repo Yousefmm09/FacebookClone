@@ -50,7 +50,6 @@ namespace FacebookClone.Service.Implementations
             return new AuthMessage { Message = "not found user" };
                     
         }
-<<<<<<< HEAD
         public async Task<AuthMessage> ResetPassword(string userId, string token, string NewPassword)
         {
             var user =  await _userManager.FindByIdAsync(userId);
@@ -69,9 +68,6 @@ namespace FacebookClone.Service.Implementations
             }
             return new AuthMessage { Message = "not found user" };
         }
-=======
-
->>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
         public async Task<AuthMessage> CreateAccessTokenAsync(User user)
         {
             var token= await GenerateJwtToken(user);
