@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 ﻿using FacebookClone.Core.Feature.Authentication.Command.Handlers;
 using FacebookClone.Core.Feature.Authentication.Command.Models;
 using FacebookClone.Core.Feature.Authentication.Queries.Models;
 
+=======
+>>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
 ﻿using FacebookClone.Core.Feature.Authentication.Queries.Models;
 using FacebookClone.Core.Feature.Users.Command.Handlers;
 using FacebookClone.Core.Feature.Users.Command.Models;
@@ -53,6 +56,7 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
+<<<<<<< HEAD
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordCommand model)
         {
@@ -70,5 +74,7 @@ namespace FacebookClone.Api.Controllers
                 ? Ok(result)
                 : BadRequest(result);
         }
+=======
+>>>>>>> 5cf699279a9852b89884195a88d9491d456f3145
     }
 }
