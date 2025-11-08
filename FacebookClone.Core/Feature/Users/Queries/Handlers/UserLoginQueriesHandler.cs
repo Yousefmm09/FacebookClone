@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Users.Queries.Handlers
 {
-    public class UserLoginQueriesHandler : IRequestHandler<UserLoginModel, JwtToken>
+    public class UserLoginQueriesHandler : IRequestHandler<UserLoginModel, AuthMessage>
     {
         private readonly UserManager<User> _userManager;
         private readonly IAuthenticationsService _authenticationsService;
@@ -25,12 +25,12 @@ namespace FacebookClone.Core.Feature.Users.Queries.Handlers
             _userManager = userManager;
             _signInManager = signInManager;
         }
-        public async Task<JwtToken> Handle(UserLoginModel request, CancellationToken cancellationToken)
+        public async Task<AuthMessage> Handle(UserLoginModel request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return new JwtToken
+                return new AuthMessage
                 {
                     Message = "Please register first before logging in."
                 };
@@ -39,7 +39,7 @@ namespace FacebookClone.Core.Feature.Users.Queries.Handlers
             var checkPassword = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (!checkPassword.Succeeded)
             {
-                return new JwtToken
+                return new AuthMessage
                 {
                     Message = "Invalid password. Please try again."
                 };
@@ -48,7 +48,7 @@ namespace FacebookClone.Core.Feature.Users.Queries.Handlers
             
             var accessToken = await _authenticationsService.CreateAccessTokenAsync(user);
 
-            return new JwtToken
+            return new AuthMessage
             {
                 Message = "Login successful",
                 AccessToken = accessToken.AccessToken,
