@@ -1,6 +1,8 @@
 ﻿using FacebookClone.Core.Feature.Authentication.Command.Handlers;
 using FacebookClone.Core.Feature.Authentication.Command.Models;
 using FacebookClone.Core.Feature.Authentication.Queries.Models;
+
+﻿using FacebookClone.Core.Feature.Authentication.Queries.Models;
 using FacebookClone.Core.Feature.Users.Command.Handlers;
 using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Core.Feature.Users.Queries.Models;
