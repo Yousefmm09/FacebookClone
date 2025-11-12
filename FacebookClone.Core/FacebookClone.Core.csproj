@@ -21,6 +21,8 @@
     <Folder Include="Feature\Authentication\Command\Models\" />
     <Folder Include="Feature\Email\Queries\Handlers\" />
     <Folder Include="Feature\Email\Queries\Models\" />
+    <Folder Include="Feature\Like\Queries\Handlers\" />
+    <Folder Include="Feature\Like\Queries\Models\" />
   </ItemGroup>
 
 </Project>

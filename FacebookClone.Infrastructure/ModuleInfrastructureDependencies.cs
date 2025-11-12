@@ -15,6 +15,7 @@ namespace FacebookClone.Infrastructure
         {
             services.AddTransient<IRefreshTokenRepository,RefreshTokenRepository>();
             services.AddTransient<IPostRepository,PostRepository>();
+            services.AddTransient<ILikeRepository,LikeRepository>();
             return services;
         }
     }
