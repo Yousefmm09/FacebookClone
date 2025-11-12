@@ -19,11 +19,14 @@ namespace FacebookClone.Service.Implementations
         private readonly IPostRepository _postRepository;
         private readonly UserManager<User> _userManage;
         private readonly IHttpContextAccessor _contextAccessor;
-        public PostService(IPostRepository postRepository,UserManager<User> userManager,IHttpContextAccessor httpContextAccessor)
+        private readonly ILikeRepository _likeRepository;
+        public PostService(IPostRepository postRepository,UserManager<User> userManager,
+            IHttpContextAccessor httpContextAccessor,ILikeRepository likeRepository)
         {
             _postRepository=postRepository;
             _userManage=userManager;
             _contextAccessor=httpContextAccessor;
+            _likeRepository=likeRepository;
         }
         public async Task<PostDto> CreatPostAsync(PostDto postDto)
         {
@@ -40,6 +43,7 @@ namespace FacebookClone.Service.Implementations
                 CreatedAt=postDto.CreatedAt,
             };
             await _postRepository.CreatPostAsync(newPost);
+            var likcount = await _postRepository.LikeCount(userId,newPost.Id);
             return new PostDto
             {
                 PostId=newPost.Id,
@@ -48,7 +52,7 @@ namespace FacebookClone.Service.Implementations
                 Content = newPost.Content,
                 ParentPostId = newPost.ParentPostId,
                 Privacy = newPost.Privacy,
-                LikeCount = newPost.LikeCount,
+                LikeCount = likcount,
                 CommentCount = newPost.CommentCount,
                 ShareCount = newPost.ShareCount,
                 CreatedAt = newPost.CreatedAt
@@ -58,10 +62,12 @@ namespace FacebookClone.Service.Implementations
         public async Task<string> DeletePost(int postId)
         {
             var user =_contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var post= await _postRepository.GetPostById(postId);
             var userId =   _userManage.Users.FirstOrDefault(x => x.Id == user);
             if (userId != null)
             {
                 var UserPost = await _postRepository.DeletePost(postId);
+                
                 return "the post delete successfully";
             }
             throw new Exception("User not authenticated");
@@ -69,13 +75,16 @@ namespace FacebookClone.Service.Implementations
 
         public async Task<PostDto> GetPostById(int postId)
         {
+            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var post = await _postRepository.GetPostById(postId);
             if (post == null)
                 throw new Exception("Post not found");
+            var likcount = await _postRepository.LikeCount(userId,postId);
             var showPost = new PostDto
             {
                 Content = post.Content,
                 Privacy = post.Privacy,
+                LikeCount = likcount,
             };
             return showPost;
         }

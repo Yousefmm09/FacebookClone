@@ -3,6 +3,7 @@ using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Infrastructure.Context;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +31,10 @@ namespace FacebookClone.Infrastructure.Implementations
 
         public async Task<string> DeletePost(int postId)
         {
-            var post = await _appDb.Posts.FindAsync(postId);
+            var post =  _appDb.Posts.Include(l=>l.Likes).FirstOrDefault(x=>x.Id==postId);
             if (post != null)
             {
+                _appDb.Likes.RemoveRange(post.Likes);
                 _appDb.Remove(post);
                 await _appDb.SaveChangesAsync();
                 return "the post delete successfully";
@@ -44,6 +46,12 @@ namespace FacebookClone.Infrastructure.Implementations
         {
             var post = await _appDb.Posts.FindAsync(postId);
             return post;
+        }
+
+        public async Task<int> LikeCount(string userId,int postId)
+        {
+            var count =   _appDb.Likes.Count(x => x.UserId == userId && x.PostId == postId);
+            return count;
         }
 
         public async Task<string> UpdatePost(Post post,int postId)
