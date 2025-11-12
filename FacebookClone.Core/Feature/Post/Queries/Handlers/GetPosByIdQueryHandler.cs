@@ -25,6 +25,7 @@ namespace FacebookClone.Core.Feature.Post.Queries.Handlers
                 Content = getPost.Content,
                 PostId = getPost.PostId,
                 Privacy=getPost.Privacy,
+                LikeCount=getPost.LikeCount,
             };
         }
     }

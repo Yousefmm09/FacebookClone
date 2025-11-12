@@ -49,10 +49,19 @@ namespace FacebookClone.Infrastructure.Context
                 .WithMany(u => u.ReceiveRequests)
                 .HasForeignKey(fr => fr.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
+         
+            base.OnModelCreating(modelBuilder);
 
-
-        }
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.Post)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+       
 
 
     }
+
+
+}
 }

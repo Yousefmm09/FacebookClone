@@ -34,23 +34,25 @@ namespace FacebookClone.Service.Implementations
             var userId = _context.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not authenticated");
-            var existingLike = await _likeRepository.GetUserLike(userId,like.postId);
-            if (existingLike != null)
-            {
-                var removeLike = _likeRepository.RemoveLike(existingLike);
-                return "Like removed successfully";
-            }
+           
             var post =  await _postRepository.GetPostById(like.postId);
             if (post == null)
                 throw new Exception("the post not found");
-
+            var existingLike = await _likeRepository.GetUserLike(userId, like.postId);
+            if (existingLike != null)
+            {
+                var removeLike = _likeRepository.RemoveLike(existingLike);
+                post.LikeCount -= 1;
+                return "Like removed successfully";
+            }
             var setLike = new Like
             {
                 UserId=userId,
                 PostId=like.postId,
                 CreatedAt=DateTime.Now,
             };
-           var res= await _likeRepository.SetLike(setLike);
+            post.LikeCount += 1;
+            var res= await _likeRepository.SetLike(setLike);
             return res;
         }
     }
