@@ -21,10 +21,6 @@
     <Folder Include="Feature\Authentication\Command\Models\" />
     <Folder Include="Feature\Email\Queries\Handlers\" />
     <Folder Include="Feature\Email\Queries\Models\" />
-    <Folder Include="Feature\Users\Command\Handlers\" />
-    <Folder Include="Feature\Users\Command\Models\" />
-    <Folder Include="Feature\Users\Queries\Handlers\" />
-    <Folder Include="Feature\Users\Queries\Models\" />
   </ItemGroup>
 
 </Project>
