@@ -10,5 +10,6 @@ namespace FacebookClone.Infrastructure.Abstract
     public  interface ICommentRepository
     {
         public Task<Comment> CreatComment(Comment comment);
+        Task<Comment?> GetUserComment(string userId, int postId);
     }
 }
