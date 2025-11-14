@@ -18,6 +18,7 @@ namespace FacebookClone.Infrastructure
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<ILikeSerivce, LikeService>();
+            services.AddTransient<ICommentService, CommentService>();
 
             return services;
         }
