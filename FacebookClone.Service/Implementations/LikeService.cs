@@ -43,6 +43,7 @@ namespace FacebookClone.Service.Implementations
             {
                 var removeLike = _likeRepository.RemoveLike(existingLike);
                 post.LikeCount -= 1;
+               await _postRepository.Update(post);
                 return "Like removed successfully";
             }
             var setLike = new Like
@@ -51,8 +52,9 @@ namespace FacebookClone.Service.Implementations
                 PostId=like.postId,
                 CreatedAt=DateTime.Now,
             };
+            var res = await _likeRepository.SetLike(setLike);
             post.LikeCount += 1;
-            var res= await _likeRepository.SetLike(setLike);
+            await _postRepository.Update(post);
             return res;
         }
     }
