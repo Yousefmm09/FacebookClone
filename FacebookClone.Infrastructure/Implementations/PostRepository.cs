@@ -30,10 +30,12 @@ namespace FacebookClone.Infrastructure.Implementations
         }
         public async Task<string> DeletePost(int postId)
         {
-            var post =  _appDb.Posts.Include(l=>l.Likes).FirstOrDefault(x=>x.Id==postId);
+            var post =  _appDb.Posts.Include(l=>l.Likes)
+                .Include(x=>x.Comments).FirstOrDefault(x=>x.Id==postId);
             if (post != null)
             {
                 _appDb.Likes.RemoveRange(post.Likes);
+                _appDb.comments.RemoveRange(post.Comments);
                 _appDb.Remove(post);
                 await _appDb.SaveChangesAsync();
                 return "the post delete successfully";

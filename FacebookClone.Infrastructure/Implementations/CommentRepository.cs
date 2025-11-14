@@ -22,5 +22,17 @@ namespace FacebookClone.Infrastructure.Implementations
             await _appDb.SaveChangesAsync();
             return comment;
         }
+
+        public async Task<Comment?> GetUserComment(string userId, int postId)
+        {
+            var comment=  _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
+            return comment;
+        }
+
+        public async Task<string> RemoveComment(Comment comment)
+        {
+            var commentpost =  _appDb.comments.Remove(comment);
+            return "the comment is removed";
+        }
     }
 }
