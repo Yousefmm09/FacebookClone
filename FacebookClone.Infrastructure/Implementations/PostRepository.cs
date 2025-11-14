@@ -28,7 +28,6 @@ namespace FacebookClone.Infrastructure.Implementations
             return post;
 
         }
-
         public async Task<string> DeletePost(int postId)
         {
             var post =  _appDb.Posts.Include(l=>l.Likes).FirstOrDefault(x=>x.Id==postId);
@@ -52,6 +51,12 @@ namespace FacebookClone.Infrastructure.Implementations
         {
             var count =   _appDb.Likes.Count(x => x.UserId == userId && x.PostId == postId);
             return count;
+        }
+
+        public async Task Update(Post post)
+        {
+            _appDb.Posts.Update(post);
+            await _appDb.SaveChangesAsync();
         }
 
         public async Task<string> UpdatePost(Post post,int postId)
