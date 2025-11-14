@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Infrastructure.Abstract
 {
-    public interface ILikeRepository
+    public  interface ICommentRepository
     {
-        public Task<string> SetLike(Like like);
-        Task<Like?> GetUserLike(string userId,int postId);
-         Task<string> RemoveLike(Like like);
+        public Task<Comment> CreatComment(Comment comment);
     }
 }

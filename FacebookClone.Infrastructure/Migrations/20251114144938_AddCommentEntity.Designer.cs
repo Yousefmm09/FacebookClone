@@ -4,6 +4,7 @@ using FacebookClone.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookClone.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDb))]
-    partial class AppDbModelSnapshot : ModelSnapshot
+    [Migration("20251114144938_AddCommentEntity")]
+    partial class AddCommentEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("comments", (string)null);
+                    b.ToTable("comments");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.FriendRequest", b =>
@@ -86,7 +89,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("friendRequests", (string)null);
+                    b.ToTable("friendRequests");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Friendship", b =>
@@ -114,7 +117,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("friendShips", (string)null);
+                    b.ToTable("friendShips");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Identity.User", b =>
@@ -219,7 +222,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("userRefreshToken", (string)null);
+                    b.ToTable("userRefreshToken");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Like", b =>
@@ -246,7 +249,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes", (string)null);
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Post", b =>
@@ -292,7 +295,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.PostMedia", b =>
@@ -318,7 +321,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostMedia", (string)null);
+                    b.ToTable("PostMedia");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

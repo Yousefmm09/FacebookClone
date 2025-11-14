@@ -17,6 +17,7 @@ namespace FacebookClone.Infrastructure.Context
             
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Comment> comments { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostMedia> PostMedia { get; set; }
         public DbSet<Like> Likes { get; set; }

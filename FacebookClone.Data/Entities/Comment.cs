@@ -26,7 +26,7 @@ namespace FacebookClone.Data.Entities
 
         public Comment? ParentComment { get; set; }
 
-        public ICollection<Comment> Replies { get; set; } = new List<Comment>();
+        public ICollection<Comment>? Replies { get; set; } = new List<Comment>();
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

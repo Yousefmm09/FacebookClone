@@ -23,10 +23,11 @@ namespace FacebookClone.Infrastructure.Implementations
             return user;
         }
 
-        public async Task RemoveLike(Like like)
+        public async Task<string> RemoveLike(Like like)
         {
             var likes= _appDb.Likes.Remove(like);
            await _appDb.SaveChangesAsync();
+            return "the like is removed";
         }
 
         public async Task<string> SetLike(Like like)
