@@ -25,6 +25,7 @@ namespace FacebookClone.Core.Feature.Post.Command.Handlers
             {
                 Content = request.Content,
                 Privacy = request.Privacy,
+                UpdatedAt = DateTime.UtcNow,
             }, request.PostId);
             if(updatePost != null)
             {

@@ -92,6 +92,7 @@ namespace FacebookClone.Service.Implementations
             {
               getPost.Content = postDto.Content;
                 getPost.Privacy = postDto.Privacy;
+                getPost.UpdatedAt = DateTime.Now;
                 await _postRepository.UpdatePost(getPost, postId);
                 return "Post updated successfully";
             }
