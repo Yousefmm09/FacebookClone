@@ -1,4 +1,4 @@
-﻿using FacebookClone.Core.Feature.Post.Command.Models;
+﻿using FacebookClone.Core.Feature.Posts.Command.Models;
 using FacebookClone.Core.Feature.Posts.DTOs;
 using FacebookClone.Service.Abstract;
 using MediatR;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FacebookClone.Core.Feature.Post.Command.Handlers
+namespace FacebookClone.Core.Feature.Posts.Command.Handlers
 {
     public class UpdatePostCommandHandler:IRequestHandler<UpdatePostCommand,string>
     {

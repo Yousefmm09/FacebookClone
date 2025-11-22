@@ -3,7 +3,7 @@ using FacebookClone.Core.Feature.Authentication.Command.Handlers;
 using FacebookClone.Core.Feature.Authentication.Command.Models;
 using FacebookClone.Core.Feature.Authentication.Queries.Models;
 using FacebookClone.Core.Feature.Authentication.Queries.Models;
-using FacebookClone.Core.Feature.Post.Command.Models;
+using FacebookClone.Core.Feature.Posts.Command.Models;
 using FacebookClone.Core.Feature.Users.Command.Handlers;
 using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Core.Feature.Users.Queries.Models;
@@ -71,6 +71,36 @@ namespace FacebookClone.Api.Controllers
             return result.Contains("success", StringComparison.OrdinalIgnoreCase)
                 ? Ok(result)
                 : BadRequest(result);
+        }
+        [HttpGet("GetProfile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(new GetProfileUserModel());
+                return Ok(result);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpDelete("deleteUser")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(new DeleteUserModel());
+                return Ok(result);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpPut("Update")]
+        public async Task<IActionResult> UpdateProfileData(UpdatedUserProfileModel command)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            return BadRequest(ModelState);
         }
     }
 }

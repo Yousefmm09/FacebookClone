@@ -1,5 +1,5 @@
-﻿using FacebookClone.Core.Feature.Post.Command.Models;
-using FacebookClone.Core.Feature.Post.Queries.Models;
+﻿using FacebookClone.Core.Feature.Post.Queries.Models;
+using FacebookClone.Core.Feature.Posts.Command.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -18,6 +18,7 @@ namespace FacebookClone.Infrastructure
             services.AddTransient<ILikeRepository,LikeRepository>();
             services.AddTransient<ICommentRepository,CommentRepository>();
             services.AddTransient<IFriendsRepository,FriendRepository>();
+            services.AddTransient<IUserRepository,UserRepository>();
             return services;
         }
     }

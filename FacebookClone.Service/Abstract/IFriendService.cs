@@ -10,9 +10,12 @@ namespace FacebookClone.Service.Abstract
 {
     public interface IFriendService
     {
-        public Task<FriendRequestDto> SendFriendRequest(FriendRequestDto friendRequest);
-        public Task<FriendshipDto> AcceptFriend(FriendshipDto friendRequest);
-        public Task<string> RemoveFriendShip(string friendId);
-
+        Task<FriendRequestDto> SendFriendRequest(FriendRequestDto friendRequest);
+        Task<FriendshipDto> AcceptFriend(FriendshipDto friendRequest);
+        Task RemoveFriendShip(string userId, string friendId);
+        Task RemoveBothFriendShips(string userId, string friendId);
+        Task RemoveFriendRequests(string userId);
+        Task<List<string>> getAllFriends(string userId);
     }
+
 }

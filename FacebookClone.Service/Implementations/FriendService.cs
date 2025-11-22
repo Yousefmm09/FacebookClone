@@ -78,31 +78,8 @@ namespace FacebookClone.Service.Implementations
             };
         }
 
-        public async Task<string> RemoveFriendShip(string friendId)
-        {
-            var userId = GetCurrentUserId();
+        
 
-            if (string.IsNullOrEmpty(friendId))
-                throw new Exception("Friend ID is required");
-
-            if (userId == friendId)
-                throw new Exception("You cannot unfriend yourself");
-
-            var friendship1 = await _friendsRepository.GetFriendShip(userId, friendId);
-
-            if (friendship1 == null)
-                throw new Exception("You are not friends");
-
-            var friendship2 = await _friendsRepository.GetFriendShip(friendId, userId);
-
-            if (friendship1 != null)
-                await _friendsRepository.RemoveFriendShip(friendship1);
-
-            if (friendship2 != null && friendship2.Id != friendship1.Id)
-                await _friendsRepository.RemoveFriendShip(friendship2);
-
-            return "Unfriend done successfully";
-        }
 
         public async Task<FriendRequestDto> SendFriendRequest(FriendRequestDto friendRequest)
         {
@@ -226,6 +203,40 @@ namespace FacebookClone.Service.Implementations
                 SentAt = newRequest.SentAt,
                 Status = FriendRequestDto.FriendRequestStatus.Pending
             };
+        }
+
+        public  Task RemoveFriendRequests(string userId)
+        {
+            return   _friendsRepository.RemoveFriendRequests(userId);
+        }
+
+        public async Task RemoveFriendShip(string userId, string friendId)
+        {
+            // علاقة user → friend
+            var friendship1 = await _friendsRepository.GetFriendShip(userId, friendId);
+            if (friendship1 != null)
+                await _friendsRepository.DeleteFriendshipEntity(friendship1);
+
+            // علاقة friend → user
+            var friendship2 = await _friendsRepository.GetFriendShip(friendId, userId);
+            if (friendship2 != null)
+                await _friendsRepository.DeleteFriendshipEntity(friendship2);
+        }
+
+        public async Task RemoveBothFriendShips(string userId, string friendId)
+{
+    // friendship 1
+    await _friendsRepository.RemoveFriendShip(userId, friendId);
+
+    // friendship 2
+    await _friendsRepository.RemoveFriendShip(friendId, userId);
+}
+
+
+
+        public Task<List<string>> getAllFriends(string userId)
+        {
+            return _friendsRepository.getAllFriends(userId);
         }
     }
 }
