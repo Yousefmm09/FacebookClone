@@ -1,4 +1,5 @@
 ﻿using FacebookClone.Core.Feature.Comments.Command.Models;
+using FacebookClone.Core.Feature.Comments.Queries.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,26 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
-
+        [HttpGet("getComment")]
+        public async Task<IActionResult> GetComment([FromQuery] GetCommentByIdModel query)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(query);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpGet("GetCommentPostsById")]
+        public async Task<IActionResult> GetCommentPostsById([FromQuery] GetPostCommentsModel query)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(query);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
     }
+
 }
