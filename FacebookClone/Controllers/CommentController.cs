@@ -1,8 +1,5 @@
 ﻿using FacebookClone.Core.Feature.Comments.Command.Models;
-<<<<<<< HEAD
 using FacebookClone.Core.Feature.Comments.Queries.Models;
-=======
->>>>>>> 13a9533776d69d7cb7fd77eb476a062271fde758
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +27,6 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
-<<<<<<< HEAD
         [HttpGet("getComment")]
         public async Task<IActionResult> GetComment([FromQuery] GetCommentByIdModel query)
         {
@@ -53,8 +49,4 @@ namespace FacebookClone.Api.Controllers
         }
     }
 
-=======
-
-    }
->>>>>>> 13a9533776d69d7cb7fd77eb476a062271fde758
 }
