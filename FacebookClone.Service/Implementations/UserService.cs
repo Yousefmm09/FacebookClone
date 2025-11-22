@@ -33,19 +33,15 @@ namespace FacebookClone.Service.Implementations
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not authenticated");
 
-            // هجيب IDS الأصدقاء
             var friends = await _friendService.getAllFriends(userId);
 
-            // امسح كل الصداقات (friend ↔ user)
             foreach (var friendId in friends)
             {
                 await _friendService.RemoveBothFriendShips(userId, friendId);
             }
 
-            // امسح كل طلبات الصداقة المرسلة / المستلمة
             await _friendService.RemoveFriendRequests(userId);
 
-            // امسح المستخدم
             return await _userRepository.DeleteUser(userId);
         }
 

@@ -212,12 +212,12 @@ namespace FacebookClone.Service.Implementations
 
         public async Task RemoveFriendShip(string userId, string friendId)
         {
-            // علاقة user → friend
+         
             var friendship1 = await _friendsRepository.GetFriendShip(userId, friendId);
             if (friendship1 != null)
                 await _friendsRepository.DeleteFriendshipEntity(friendship1);
 
-            // علاقة friend → user
+            
             var friendship2 = await _friendsRepository.GetFriendShip(friendId, userId);
             if (friendship2 != null)
                 await _friendsRepository.DeleteFriendshipEntity(friendship2);
@@ -231,8 +231,6 @@ namespace FacebookClone.Service.Implementations
     // friendship 2
     await _friendsRepository.RemoveFriendShip(friendId, userId);
 }
-
-
 
         public Task<List<string>> getAllFriends(string userId)
         {
