@@ -23,6 +23,7 @@ namespace FacebookClone.Infrastructure.Implementations
             return comment;
         }
 
+<<<<<<< HEAD
         public async Task<Comment> GetCommentById(int id)
         {
             var comment=  _appDb.comments.FirstOrDefault(x=>x.Id==id);
@@ -49,5 +50,18 @@ namespace FacebookClone.Infrastructure.Implementations
         }
 
       
+=======
+        public async Task<Comment?> GetUserComment(string userId, int postId)
+        {
+            var comment=  _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
+            return comment;
+        }
+
+        public async Task<string> RemoveComment(Comment comment)
+        {
+            var commentpost =  _appDb.comments.Remove(comment);
+            return "the comment is removed";
+        }
+>>>>>>> 13a9533776d69d7cb7fd77eb476a062271fde758
     }
 }
