@@ -23,8 +23,6 @@
     <Folder Include="Feature\Comments\Queries\Models\" />
     <Folder Include="Feature\Email\Queries\Handlers\" />
     <Folder Include="Feature\Email\Queries\Models\" />
-    <Folder Include="Feature\Friends\Queries\Handlers\" />
-    <Folder Include="Feature\Friends\Queries\Models\" />
     <Folder Include="Feature\Like\Queries\Handlers\" />
     <Folder Include="Feature\Like\Queries\Models\" />
   </ItemGroup>

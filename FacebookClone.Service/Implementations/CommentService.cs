@@ -51,5 +51,47 @@ namespace FacebookClone.Service.Implementations
                //Replies= comment.Replies,
             };
         }
+
+        public async Task<CommentDto> GetCommentById(int id)
+        {
+            var comment= await _commentRepository.GetCommentById(id);
+            if (comment == null)
+                throw new Exception("the comment not found");
+            return new CommentDto
+            {
+                Content=comment.Content,
+               CreatedAt=comment.CreatedAt,
+               //Replies= comment.Replies,
+            };
+        }
+
+        public async Task<IEnumerable<CommentDto>> GetPostComments(int postId)
+        {
+            var comments = await _commentRepository.GetPostComments(postId);
+            if (comments == null)
+                throw new Exception("the comment not found");
+            return comments.Select(comment => new CommentDto
+            {
+                Content = comment.Content,
+                CreatedAt = comment.CreatedAt,
+                //Replies= comment.Replies,
+            });
+        }
+
+        public async Task<Comment?> GetUserComment(string userId, int postId)
+        {
+            var comment= _commentRepository.GetUserComment(userId, postId);
+            return await comment;
+        }
+
+        public async Task<string> RemoveComment(int id)
+        {
+            var comment = await _commentRepository.GetCommentById(id);
+            if (comment == null)
+                throw new Exception("Comment not found");
+
+            await _commentRepository.RemoveComment(comment);
+            return "Comment removed successfully";
+        }
     }
 }
