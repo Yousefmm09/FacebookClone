@@ -42,15 +42,6 @@ namespace FacebookClone.Infrastructure.Implementations
             return Task.FromResult(comment);
         }
 
-<<<<<<< HEAD
-        public Task<string> RemoveComment(Comment comment)
-        {
-            var commentpost =  _appDb.comments.Remove(comment);
-            return Task.FromResult("the comment is removed");
-        }
-
-      
-=======
         public async Task<string> RemoveComment(Comment comment)
         {
             var commentpost = _appDb.comments.Remove(comment);
@@ -74,7 +65,5 @@ namespace FacebookClone.Infrastructure.Implementations
             var userComment = _appDb.comments.FirstOrDefault(x => x.UserId == userId);
             return Task.FromResult(userComment);
         }
-
->>>>>>> Comment
     }
 }
