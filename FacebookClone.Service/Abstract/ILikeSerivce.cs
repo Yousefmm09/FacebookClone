@@ -11,5 +11,6 @@ namespace FacebookClone.Service.Abstract
     public interface ILikeSerivce
     {
         public Task<string> SetLike(LikeDto like);
+        public Task<string> RemoveLike(int id);
     }
 }

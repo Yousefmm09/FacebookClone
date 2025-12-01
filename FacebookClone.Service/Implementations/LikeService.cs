@@ -29,6 +29,18 @@ namespace FacebookClone.Service.Implementations
             _postRepository = postRepository;
             _userManager = userManager;
         }
+
+        public Task<string> RemoveLike(int id)
+        {
+            var userId = _context.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("User not authenticated");
+            var existingLike =  _likeRepository.GetUserLike(userId, id);
+            if (existingLike == null)
+                throw new Exception("Like not found");
+            return _likeRepository.RemoveLike(existingLike.Result);
+        }
+
         public async Task<string> SetLike(LikeDto like)
         {
             var userId = _context.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

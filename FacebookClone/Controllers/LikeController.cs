@@ -26,5 +26,15 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
+        [HttpDelete("removeLike")]
+        public async Task<IActionResult> RemoveLike([FromQuery] RemoveLikeCommand command)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(command);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
     }
 }
