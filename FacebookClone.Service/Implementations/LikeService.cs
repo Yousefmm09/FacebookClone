@@ -30,6 +30,11 @@ namespace FacebookClone.Service.Implementations
             _userManager = userManager;
         }
 
+        public Task<int> GetLikesCount(int postId)
+        {
+            return _likeRepository.GetLikesCount(postId);
+        }
+
         public Task<string> RemoveLike(int id)
         {
             var userId = _context.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

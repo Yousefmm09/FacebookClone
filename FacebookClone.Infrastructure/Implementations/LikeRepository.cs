@@ -17,6 +17,11 @@ namespace FacebookClone.Infrastructure.Implementations
             _appDb=appDb;
         }
 
+        public Task<int> GetLikesCount(int postId)
+        {
+            return Task.FromResult(_appDb.Likes.Count(x => x.PostId == postId));
+        }
+
         public async Task<Like?> GetUserLike(string userId, int postId)
         {
             var user =   _appDb.Likes.FirstOrDefault(x => x.UserId == userId && x.PostId == postId);
