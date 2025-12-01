@@ -13,5 +13,6 @@ namespace FacebookClone.Infrastructure.Abstract
         Task<Like?> GetUserLike(string userId,int postId);
          Task<string> RemoveLike(Like like);
         public Task<int> GetLikesCount(int postId);
+
     }
 }
