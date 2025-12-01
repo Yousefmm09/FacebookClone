@@ -27,11 +27,6 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
-<<<<<<< HEAD
-
-    
-=======
->>>>>>> Comment
         [HttpGet("getComment")]
         public async Task<IActionResult> GetComment([FromQuery] GetCommentByIdModel query)
         {
