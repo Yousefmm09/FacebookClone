@@ -47,6 +47,26 @@ namespace FacebookClone.Api.Controllers
             }
             return BadRequest(ModelState);
         }
+        [HttpDelete("removeComment")]
+        public async Task<IActionResult> RemoveComment([FromQuery] RemoveCommentCommand command)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(command);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpPut("editComment")]
+        public async Task<IActionResult> EditComment([FromQuery] EditCommentCommand command)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _mediator.Send(command);
+                return Ok(res);
+            }
+            return BadRequest(ModelState);
+        }
     }
 
 }

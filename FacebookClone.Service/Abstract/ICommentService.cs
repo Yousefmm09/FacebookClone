@@ -18,5 +18,6 @@ namespace FacebookClone.Service.Abstract
         public Task<Comment?> GetUserComment(string userId, int postId);
 
         public Task<IEnumerable<CommentDto>> GetPostComments(int postId);
+        public Task<string> EditComment(int postId,CommentDto comment);
     }
 }

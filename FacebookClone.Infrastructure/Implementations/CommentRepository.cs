@@ -25,7 +25,7 @@ namespace FacebookClone.Infrastructure.Implementations
 
         public async Task<Comment> GetCommentById(int id)
         {
-            var comment=  _appDb.comments.FirstOrDefault(x=>x.Id==id);
+            var comment=   _appDb.comments.Where(x=>x.Id==id).FirstOrDefault();
                 return comment;
                 
         }
@@ -36,12 +36,13 @@ namespace FacebookClone.Infrastructure.Implementations
             return Task.FromResult(comments);
         }
 
-        public Task<Comment?> GetUserComment(string userId, int postId)
+        public  Task<Comment?> GetUserComment(string userId, int postId)
         {
-            var comment=  _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
+            var comment=   _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
             return Task.FromResult(comment);
         }
 
+<<<<<<< HEAD
         public Task<string> RemoveComment(Comment comment)
         {
             var commentpost =  _appDb.comments.Remove(comment);
@@ -49,5 +50,31 @@ namespace FacebookClone.Infrastructure.Implementations
         }
 
       
+=======
+        public async Task<string> RemoveComment(Comment comment)
+        {
+            var commentpost = _appDb.comments.Remove(comment);
+            await _appDb.SaveChangesAsync();
+            return "the comment is removed";
+        }
+
+        public Task<Comment> EditComment(int id, Comment comment)
+        {
+            var existingComment = _appDb.comments.FirstOrDefault(x => x.Id == id);
+            if (existingComment != null)
+            {
+                _appDb.Update(existingComment);
+                _appDb.SaveChanges();
+            }
+            return Task.FromResult(existingComment);
+        }
+
+        public Task<Comment?> UserComment(string userId)
+        {
+            var userComment = _appDb.comments.FirstOrDefault(x => x.UserId == userId);
+            return Task.FromResult(userComment);
+        }
+
+>>>>>>> Comment
     }
 }
