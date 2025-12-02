@@ -1,4 +1,6 @@
-﻿using FacebookClone.Core.Feature.Admin.Queries;
+﻿using FacebookClone.Core.Feature.Admin.Command.Handlers;
+using FacebookClone.Core.Feature.Admin.Command.Models;
+using FacebookClone.Core.Feature.Admin.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +27,26 @@ namespace FacebookClone.Api.Controllers
                 PageNumber = pageNumber
             };
             return _mediator.Send(query).ContinueWith<IActionResult>(t => Ok(t.Result));
+        }
+        [HttpPost("banned")]
+        public async Task<IActionResult> BannedUser([FromBody] BannedUserModel command )
+        {
+         if(ModelState.IsValid)
+            {
+                var res= await _mediator.Send(command);
+                return Ok(res);
+            }
+         return BadRequest(ModelState);
+        }
+        [HttpPost("Unbanned_User")]
+        public async Task<IActionResult> UnBannedUser([FromBody] UnbannedUserModel command )
+        {
+         if(ModelState.IsValid)
+            {
+                var res= await _mediator.Send(command);
+                return Ok(res);
+            }
+         return BadRequest(ModelState);
         }
     }
 }

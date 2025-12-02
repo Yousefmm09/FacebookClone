@@ -24,11 +24,31 @@ namespace FacebookClone.Service.Implementations
 
             return user.Select(x => new UserDto
             {
-                Id=x.Id,
-                UserName=x.UserName,
-                CreatedAt=x.CreatedAt,
-                Email=x.Email
+                Id = x.Id,
+                UserName = x.UserName,
+                CreatedAt = x.CreatedAt,
+                Email = x.Email
             }).ToList();
+        }
+        public async Task<MessageDto> BannedUser(string userId,string BannedReason)
+        {
+            var user= await _adminRepository.BannedUser(userId,BannedReason);
+            if (user == true)
+                return new MessageDto
+                {
+                    Message = "The user is banned Successfully"
+                };
+            return new MessageDto { Message = "The user is not banned" };
+        }
+        public async Task<MessageDto> UnbannedUser(string userId)
+        {
+            var user= await _adminRepository.UnbannedUser(userId);
+            if (user == true)
+                return new MessageDto
+                {
+                    Message = "The user is unbanned Successfully"
+                };
+            return new MessageDto { Message = "The user is not unbanned" };
         }
     }
 }

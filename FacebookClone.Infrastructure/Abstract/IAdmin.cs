@@ -11,5 +11,7 @@ namespace FacebookClone.Infrastructure.Abstract
     {
         public Task<List<User>> GetAllUser(int PageSize,int PageNumber);
         public Task<int> GetTotalUsersCountAsync();
+        public Task<bool> BannedUser(string userId, string BannedReason);
+        public Task<bool> UnbannedUser(string userId);
     }
 }

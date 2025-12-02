@@ -30,5 +30,27 @@ namespace FacebookClone.Infrastructure.Implementations
         {
             return await _appDb.Users.CountAsync();
         }
+
+        public async Task<bool> BannedUser(string userId,string BannedReason)
+        {
+            var user= await _appDb.Users.FindAsync( userId);
+            if (user == null)
+                throw new Exception("Not Found User");
+            user.IsBanned = true;
+            user.BanReason = BannedReason;
+            user.BannedAt=DateTime.Now;
+            await _appDb.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> UnbannedUser(string userId)
+        {
+            var user = await _appDb.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("Not Found User");
+            user.IsBanned = false;
+            user.BannedAt = DateTime.Now;
+            await _appDb.SaveChangesAsync();
+            return true;
+        }
     }
 }

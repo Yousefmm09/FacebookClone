@@ -17,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Feature\Admin\Command\Handlers\" />
-    <Folder Include="Feature\Admin\Command\Models\" />
     <Folder Include="Feature\Authentication\Command\Handlers\" />
     <Folder Include="Feature\Authentication\Command\Models\" />
     <Folder Include="Feature\Comments\Queries\Handlers\" />
