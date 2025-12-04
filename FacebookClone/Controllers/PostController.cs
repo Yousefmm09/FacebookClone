@@ -42,5 +42,11 @@ namespace FacebookClone.Api.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+        [HttpPost("SharePost")]
+        public async Task<IActionResult> SharePost([FromBody] SharePostCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }

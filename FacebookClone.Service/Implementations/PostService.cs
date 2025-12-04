@@ -3,6 +3,7 @@ using FacebookClone.Data.Entities;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Service.Abstract;
+using FacebookClone.Service.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -78,6 +79,37 @@ namespace FacebookClone.Service.Implementations
                 Privacy = post.Privacy,
             };
             return showPost;
+        }
+
+        public async Task<PostShareDto> SharePost(int PostId)
+        {
+            var user = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+                throw new Exception("the user not authoraized");
+            var getPost = await _postRepository.GetPostById(PostId);
+            if (getPost == null)
+             throw new Exception("Not found post");
+            var existingShare = await _postRepository.GetPostShare(PostId, user);
+            if (existingShare != null)
+                throw new Exception("You have already shared this post");
+
+            var share = new PostsShare
+            {
+                UserId = user,
+                PostId = getPost.Id,
+                CreatedAt = DateTime.Now,
+            };
+           
+
+            getPost.ShareCount += 1;
+            await _postRepository.SharePost(share);
+            return new PostShareDto
+            {
+                Id = share.Id,
+                PostId = getPost.Id,
+                UserId = share.UserId,
+                CreatedAt = share.CreatedAt,
+            };
         }
 
         public async Task<string> UpdatePost(PostDto postDto,int postId)

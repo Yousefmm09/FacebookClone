@@ -13,5 +13,7 @@ namespace FacebookClone.Infrastructure.Abstract
         public Task<string> DeletePost(int postId);
         public Task<string> UpdatePost(Post post, int postId);
         public Task<Post> GetPostById(int postId);
+        public Task<PostsShare> SharePost(PostsShare postsShare);
+        public  Task<PostsShare?> GetPostShare(int postId, string userId);
     }
 }

@@ -23,6 +23,7 @@ namespace FacebookClone.Infrastructure.Context
         public DbSet<FriendRequest> friendRequests { get; set; }
         public DbSet<Friendship> friendShips { get; set; }
         public DbSet<UserRefreshToken> userRefreshToken { get; set; }
+        public DbSet<PostsShare> postsShares { get; set; }
         public AppDb(DbContextOptions<AppDb> options): base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
