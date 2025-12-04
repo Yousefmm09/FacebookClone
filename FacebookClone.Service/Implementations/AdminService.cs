@@ -59,7 +59,7 @@ namespace FacebookClone.Service.Implementations
         public async Task<UserDto> GetUserDetails(string userId)
         {
             var getuser= await _adminRepository.GetUserDetails(userId);
-            var countPost= await _postRepository.GetCountPostbyUser(userId);
+            var countPost= await _postRepository.GetTotalPostsCountAsync(userId);
             var CountFriendShip=await _friendsRepository.CountFriendsofUser(userId);
             if(getuser!=null)
             {

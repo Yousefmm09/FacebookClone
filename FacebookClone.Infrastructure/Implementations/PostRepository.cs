@@ -60,7 +60,10 @@ namespace FacebookClone.Infrastructure.Implementations
             _appDb.Posts.Update(post);
             await _appDb.SaveChangesAsync();
         }
-
+        public Task<int> GetTotalPostsCountAsync(string userId)
+        {
+            return _appDb.Posts.CountAsync(x => x.UserId == userId);
+        }
         public async Task<string> UpdatePost(Post post,int postId)
         {
             var postInDb = await _appDb.Posts.FindAsync(postId);
