@@ -52,5 +52,13 @@ namespace FacebookClone.Infrastructure.Implementations
             await _appDb.SaveChangesAsync();
             return true;
         }
+
+        public async Task<User> GetUserDetails(string userId)
+        {
+            var user =await _appDb.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("Not Found User");
+            return user;
+        }
     }
 }

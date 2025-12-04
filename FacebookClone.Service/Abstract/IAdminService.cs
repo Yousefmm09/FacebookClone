@@ -13,5 +13,7 @@ namespace FacebookClone.Service.Abstract
         public Task<List<UserDto>> GetAllUser(int PageSize, int PageNumber);
         public Task<MessageDto> BannedUser(string userId, string BannedReason);
         public Task<MessageDto> UnbannedUser(string userId);
+        public Task<UserDto> GetUserDetails(string userId);
+
     }
 }

@@ -13,9 +13,12 @@ namespace FacebookClone.Service.Implementations
     public class AdminService : IAdminService
     {
         private readonly IAdmin _adminRepository;
-        public AdminService(IAdmin adminRepository)
+        private readonly IPostRepository _postRepository;
+        private readonly 
+        public AdminService(IAdmin adminRepository, IPostRepository postRepository)
         {
             _adminRepository = adminRepository;
+            _postRepository = postRepository;
         }
         public async Task<List<UserDto>> GetAllUser(int PageSize, int PageNumber)
         {
@@ -49,6 +52,23 @@ namespace FacebookClone.Service.Implementations
                     Message = "The user is unbanned Successfully"
                 };
             return new MessageDto { Message = "The user is not unbanned" };
+        }
+
+        public async Task<UserDto> GetUserDetails(string userId)
+        {
+            var getuser= await _adminRepository.GetUserDetails(userId);
+            var countPost= await _postRepository.GetCountPostbyUser(userId);
+            var CountFriendShip=
+            if(getuser!=null)
+            {
+                return new UserDto
+                {
+                    UserName=getuser.UserName,
+                    Email=getuser.Email,
+                    PostCount=countPost,
+                    FrinedCount=
+                };
+            }
         }
     }
 }
