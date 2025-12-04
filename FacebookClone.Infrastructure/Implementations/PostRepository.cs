@@ -48,6 +48,15 @@ namespace FacebookClone.Infrastructure.Implementations
             var post = await _appDb.Posts.FindAsync(postId);
             return post;
         }
+        public async Task<int> GetCountPostbyUser(string userId)
+        {
+            var user = await _appDb.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("not found user");
+            var CountPosts= _appDb.Posts.Where(x=>x.UserId==userId).Count();
+
+            return CountPosts;
+        }
 
         public async Task<int> LikeCount(string userId,int postId)
         {
