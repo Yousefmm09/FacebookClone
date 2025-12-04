@@ -64,6 +64,14 @@ namespace FacebookClone.Infrastructure.Implementations
         {
             return _appDb.Posts.CountAsync(x => x.UserId == userId);
         }
+        public async Task<PostsShare> SharePost(PostsShare posts)
+        {
+           
+            var res = await _appDb.postsShares.AddAsync(posts);
+            await _appDb.SaveChangesAsync();
+            return res.Entity;
+        }
+
         public async Task<string> UpdatePost(Post post,int postId)
         {
             var postInDb = await _appDb.Posts.FindAsync(postId);
@@ -74,6 +82,11 @@ namespace FacebookClone.Infrastructure.Implementations
             var res = _appDb.Update(post);
             await _appDb.SaveChangesAsync();
             return "Post Updated Successfully";
+        }
+        public async Task<PostsShare?> GetPostShare(int postId, string userId)
+        {
+            return await _appDb.postsShares
+                .FirstOrDefaultAsync(s => s.PostId == postId && s.UserId == userId);
         }
     }
 }
