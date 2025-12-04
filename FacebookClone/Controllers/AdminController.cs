@@ -48,5 +48,15 @@ namespace FacebookClone.Api.Controllers
             }
          return BadRequest(ModelState);
         }
+        [HttpPost("UserDetails")]
+        public async Task<IActionResult> getUserDetails([FromForm] GetUserDetailsQuery query )
+        {
+         if(ModelState.IsValid)
+            {
+                var res= await _mediator.Send(query);
+                return Ok(res);
+            }
+         return BadRequest(ModelState);
+        }
     }
 }

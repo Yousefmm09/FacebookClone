@@ -19,11 +19,8 @@ namespace FacebookClone.Infrastructure
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<ILikeSerivce, LikeService>();
             services.AddTransient<ICommentService, CommentService>();
-<<<<<<< HEAD
             services.AddTransient<IFriendService, FriendService>();
-=======
             services.AddTransient<IAdminService, AdminService>();
->>>>>>> feature/Admin
 
             return services;
         }

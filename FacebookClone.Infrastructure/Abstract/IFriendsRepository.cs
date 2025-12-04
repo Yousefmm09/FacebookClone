@@ -15,5 +15,6 @@ namespace FacebookClone.Infrastructure.Abstract
         public Task RemoveFriendShip(Friendship friendship);
         Task<Friendship> GetFriendShip(string userId, string friendId);
         Task UpdateFriendRequest(FriendRequest friendRequest);
+        public  Task<int> CountFriendsofUser(string userId);
     }
 }

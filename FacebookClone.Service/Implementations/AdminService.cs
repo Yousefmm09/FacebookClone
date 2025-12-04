@@ -2,6 +2,7 @@
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Service.Abstract;
 using FacebookClone.Service.Dto;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,12 @@ namespace FacebookClone.Service.Implementations
     {
         private readonly IAdmin _adminRepository;
         private readonly IPostRepository _postRepository;
-        private readonly 
-        public AdminService(IAdmin adminRepository, IPostRepository postRepository)
+        private readonly IFriendsRepository _friendsRepository;
+        public AdminService(IAdmin adminRepository, IPostRepository postRepository,IFriendsRepository friendsRepository)
         {
             _adminRepository = adminRepository;
             _postRepository = postRepository;
+            _friendsRepository = friendsRepository;
         }
         public async Task<List<UserDto>> GetAllUser(int PageSize, int PageNumber)
         {
@@ -58,7 +60,7 @@ namespace FacebookClone.Service.Implementations
         {
             var getuser= await _adminRepository.GetUserDetails(userId);
             var countPost= await _postRepository.GetCountPostbyUser(userId);
-            var CountFriendShip=
+            var CountFriendShip=await _friendsRepository.CountFriendsofUser(userId);
             if(getuser!=null)
             {
                 return new UserDto
@@ -66,9 +68,10 @@ namespace FacebookClone.Service.Implementations
                     UserName=getuser.UserName,
                     Email=getuser.Email,
                     PostCount=countPost,
-                    FrinedCount=
+                    FrinedCount=CountFriendShip
                 };
             }
+            throw new Exception("not found user");
         }
     }
 }

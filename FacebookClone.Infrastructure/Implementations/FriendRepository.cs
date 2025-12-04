@@ -53,6 +53,14 @@ namespace FacebookClone.Infrastructure.Implementations
             _appDb.friendShips.Remove(friendship);
             await _appDb.SaveChangesAsync();
         }
+        public async Task<int> CountFriendsofUser(string userId)
+        {
+            var user= await _appDb.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("Not Found User");
+            var count=await _appDb.friendShips.Where(x=>x.UserId == userId).CountAsync();
+            return count;
+        }
         public async Task<Friendship> GetFriendShip(string userId, string friendId)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(friendId))
@@ -63,5 +71,6 @@ namespace FacebookClone.Infrastructure.Implementations
                     (x.UserId == userId && x.FriendId == friendId) ||
                     (x.UserId == friendId && x.FriendId == userId));
         }
+        
     }
 }
