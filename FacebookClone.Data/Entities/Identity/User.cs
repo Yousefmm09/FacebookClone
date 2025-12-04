@@ -13,11 +13,8 @@ namespace FacebookClone.Data.Entities.Identity
             public string? ProfilePictureUrl { get; set; } = string.Empty;
             public string? Bio { get; set; } = string.Empty;
             public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-            public bool IsBanned { get; set; }
-            public string? BanReason { get; set; }
-            public DateTime? BannedAt { get; set; }
 
-           public ICollection<Post> Posts { get; set; } = new List<Post>();
+            public ICollection<Post> Posts { get; set; } = new List<Post>();
             public ICollection<Comment> Comments { get; set; } = new List<Comment>();
             public ICollection<Like> Likes { get; set; } = new List<Like>();
 
