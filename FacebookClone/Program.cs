@@ -1,5 +1,4 @@
 using FacebookClone.Core;
-using FacebookClone.Core.Middleware;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure;
 using FacebookClone.Infrastructure.Context;
@@ -80,7 +79,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication(); 
 app.UseAuthorization();
-app.UseMiddleware<BannedUserCheck>();
+
 app.MapControllers();
 
 app.Run();

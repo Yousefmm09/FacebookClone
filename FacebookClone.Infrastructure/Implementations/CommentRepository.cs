@@ -23,16 +23,48 @@ namespace FacebookClone.Infrastructure.Implementations
             return comment;
         }
 
-        public async Task<Comment?> GetUserComment(string userId, int postId)
+        public async Task<Comment> GetCommentById(int id)
         {
-            var comment=  _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
-            return comment;
+            var comment=   _appDb.comments.Where(x=>x.Id==id).FirstOrDefault();
+                return comment;
+                
+        }
+
+        public  Task<IEnumerable<Comment>> GetPostComments(int postId)
+        {
+            var comments=  _appDb.comments.Where(x=>x.PostId==postId).AsEnumerable();
+            return Task.FromResult(comments);
+        }
+
+        public  Task<Comment?> GetUserComment(string userId, int postId)
+        {
+            var comment=   _appDb.comments.FirstOrDefault(x=>x.UserId==userId && x.PostId==postId);
+            return Task.FromResult(comment);
         }
 
         public async Task<string> RemoveComment(Comment comment)
         {
-            var commentpost =  _appDb.comments.Remove(comment);
+            var commentpost = _appDb.comments.Remove(comment);
+            await _appDb.SaveChangesAsync();
             return "the comment is removed";
         }
+
+        public Task<Comment> EditComment(int id, Comment comment)
+        {
+            var existingComment = _appDb.comments.FirstOrDefault(x => x.Id == id);
+            if (existingComment != null)
+            {
+                _appDb.Update(existingComment);
+                _appDb.SaveChanges();
+            }
+            return Task.FromResult(existingComment);
+        }
+
+        public Task<Comment?> UserComment(string userId)
+        {
+            var userComment = _appDb.comments.FirstOrDefault(x => x.UserId == userId);
+            return Task.FromResult(userComment);
+        }
+
     }
 }

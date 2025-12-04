@@ -55,7 +55,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("comments");
+                    b.ToTable("comments", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.FriendRequest", b =>
@@ -86,7 +86,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("friendRequests");
+                    b.ToTable("friendRequests", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Friendship", b =>
@@ -114,7 +114,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("friendShips");
+                    b.ToTable("friendShips", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Identity.User", b =>
@@ -124,12 +124,6 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("BanReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("BannedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
@@ -146,9 +140,6 @@ namespace FacebookClone.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -228,7 +219,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("userRefreshToken");
+                    b.ToTable("userRefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Like", b =>
@@ -255,7 +246,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.Post", b =>
@@ -301,7 +292,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.PostMedia", b =>
@@ -327,7 +318,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostMedia");
+                    b.ToTable("PostMedia", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

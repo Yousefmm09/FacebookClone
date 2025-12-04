@@ -23,4 +23,8 @@ namespace FacebookClone.Data.Entities
 
             public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         }
+    
+
+
+
 }
