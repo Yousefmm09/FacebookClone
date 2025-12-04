@@ -1,6 +1,4 @@
 ﻿using FacebookClone.Core.Feature.Like.Command.Models;
-
-using FacebookClone.Core.Feature.Like.Queries.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,26 +23,6 @@ namespace FacebookClone.Api.Controllers
             {
                var res= await _mediator.Send(command);
                 return Ok( res);
-            }
-            return BadRequest(ModelState);
-        }
-        [HttpGet("getLikesCount")]
-        public async Task<IActionResult> GetLikesCount([FromQuery] GetCountLikesQuery command)
-        {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
-        }
-        [HttpDelete("removeLike")]
-        public async Task<IActionResult> RemoveLike([FromQuery] RemoveLikeCommand command)
-        {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
             }
             return BadRequest(ModelState);
         }
