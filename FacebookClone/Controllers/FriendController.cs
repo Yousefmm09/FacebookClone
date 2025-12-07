@@ -1,50 +1,47 @@
 ﻿using FacebookClone.Core.Feature.Friends.Command.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FacebookClone.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="User")]
+    [Authorize(Roles = "User")]
     public class FriendController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public FriendController(IMediator mediator)
         {
             _mediator = mediator;
         }
+
         [HttpPost("send")]
-        public async Task<IActionResult> SendRequest(SentFriendRequestCommand command)
+        public async Task<IActionResult> SendFriendRequest([FromBody] SentFriendRequestCommand command)
         {
-            if(ModelState.IsValid)
-            {
-               var res= await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
-        [HttpPost("Accept")]
-        public async Task<IActionResult> AcceptFriend(AcceptFriendCommand command)
+
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptFriend([FromBody] AcceptFriendCommand command)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
-        [HttpDelete("Remove")]
-        public async Task<IActionResult> RemoveFriend(RemoveFriendCommand command)
+
+        [HttpDelete("remove")]
+        public async Task<IActionResult> RemoveFriend([FromQuery] RemoveFriendCommand command)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
     }
 }

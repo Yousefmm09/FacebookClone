@@ -2,71 +2,65 @@
 using FacebookClone.Core.Feature.Comments.Queries.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FacebookClone.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles =("User"))]
+    [Authorize(Roles = "User")]
     public class CommentController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public CommentController(IMediator mediator)
         {
-         _mediator=mediator;   
+            _mediator = mediator;
         }
-        [HttpPost("creatComment")]
-        public async Task<IActionResult> CreatComment(CreatCommentCommand command)
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateComment([FromBody] CreatCommentCommand command)
         {
-            if(ModelState.IsValid)
-            {
-                var res=  await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
-        [HttpGet("getComment")]
+
+        [HttpGet("single")]
         public async Task<IActionResult> GetComment([FromQuery] GetCommentByIdModel query)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(query);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
-        [HttpGet("GetCommentPostsById")]
-        public async Task<IActionResult> GetCommentPostsById([FromQuery] GetPostCommentsModel query)
+
+        [HttpGet("post")]
+        public async Task<IActionResult> GetPostComments([FromQuery] GetPostCommentsModel query)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(query);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
-        [HttpDelete("removeComment")]
+
+        [HttpDelete("remove")]
         public async Task<IActionResult> RemoveComment([FromQuery] RemoveCommentCommand command)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
-        [HttpPut("editComment")]
+
+        [HttpPut("edit")]
         public async Task<IActionResult> EditComment([FromQuery] EditCommentCommand command)
         {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
     }
-
 }

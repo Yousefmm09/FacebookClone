@@ -2,9 +2,7 @@
 using FacebookClone.Core.Feature.Post.Queries.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FacebookClone.Api.Controllers
 {
@@ -14,37 +12,53 @@ namespace FacebookClone.Api.Controllers
     public class PostController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public PostController(IMediator mediator)
         {
             _mediator = mediator;
         }
-        [HttpPost("create")]
+
+        [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] CreatPostCommand command)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-        [HttpDelete("delete")]
+
+        [HttpDelete]
         public async Task<IActionResult> DeletePost([FromQuery] DeletePostCommand command)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-        [HttpPut("update")]
+
+        [HttpPut]
         public async Task<IActionResult> UpdatePost([FromBody] UpdatePostCommand command)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-        [HttpGet("GetPostById")]
-        public async Task<IActionResult> GetPostById([FromQuery] GetPosByIdQuery command)
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPostById([FromRoute] int id)
         {
-            var result = await _mediator.Send(command);
+            var query = new GetPosByIdQuery { PostId = id };
+
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
-        [HttpPost("SharePost")]
+
+        [HttpPost("share")]
         public async Task<IActionResult> SharePost([FromBody] SharePostCommand command)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }

@@ -1,15 +1,9 @@
-
-using FacebookClone.Core.Feature.Authentication.Command.Handlers;
 using FacebookClone.Core.Feature.Authentication.Command.Models;
 using FacebookClone.Core.Feature.Authentication.Queries.Models;
-using FacebookClone.Core.Feature.Authentication.Queries.Models;
-using FacebookClone.Core.Feature.Post.Command.Models;
-using FacebookClone.Core.Feature.Users.Command.Handlers;
 using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Core.Feature.Users.Queries.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FacebookClone.Api.Controllers
@@ -19,55 +13,55 @@ namespace FacebookClone.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public UserController(IMediator mediator)
         {
             _mediator = mediator;
         }
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromForm]UserRegisterModel command)
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromForm] UserRegisterModel command)
         {
-            if(ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
-        }
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody]UserLoginModel command)
-        {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
-        }
-        [HttpGet("ConfirmEmail")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailQuery command)
-        {
-            if (ModelState.IsValid)
-            {
-                var res = await _mediator.Send(command);
-                return Ok(res);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
 
-        [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordCommand model)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginModel command)
         {
-            var result = await _mediator.Send(model);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailQuery command)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordCommand command)
+        {
+            var result = await _mediator.Send(command);
+
             return result.Contains("success", StringComparison.OrdinalIgnoreCase)
                 ? Ok(result)
                 : BadRequest(result);
         }
 
-        [HttpGet("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery] ResestPasswordCommand model)
+        [HttpGet("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromQuery] ResestPasswordCommand command)
         {
-            var result = await _mediator.Send(model);
+            var result = await _mediator.Send(command);
+
             return result.Contains("success", StringComparison.OrdinalIgnoreCase)
                 ? Ok(result)
                 : BadRequest(result);
