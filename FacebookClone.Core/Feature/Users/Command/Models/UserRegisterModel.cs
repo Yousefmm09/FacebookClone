@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace FacebookClone.Core.Feature.Users.Command.Models
         public string PhoneNumber { get; set; } = string.Empty;
         public string? Bio {  get; set; }
         public DateTime CreatedAt { get; set; }
+        public IFormFile Image { get; set; }
 
     }
 }

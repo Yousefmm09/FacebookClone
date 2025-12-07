@@ -1,5 +1,6 @@
 ﻿using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Data.Entities.Identity;
+using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Service.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -15,17 +16,19 @@ namespace FacebookClone.Core.Feature.Users.Command.Handlers
         private readonly IAuthenticationsService _authenticationsService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IEmailService _emailService;
-
+        private readonly IFile _file;
         public UserRegisterCommandHandler(
             UserManager<User> userManager,
             IAuthenticationsService authenticationsService,
             IHttpContextAccessor contextAccessor,
-            IEmailService emailService)
+            IEmailService emailService
+            ,IFile file)
         {
             _userManager = userManager;
             _authenticationsService = authenticationsService;
             _contextAccessor = contextAccessor;
             _emailService = emailService;
+            _file = file;
         }
 
         public async Task<string> Handle(UserRegisterModel request, CancellationToken cancellationToken)
@@ -36,14 +39,15 @@ namespace FacebookClone.Core.Feature.Users.Command.Handlers
 
             if (request.Password != request.ConfirmPassword)
                 return "The password does not match the confirmation password";
-
+            var ProfilePic =  await _file.UploadIamge("User", request.Image);
             var newUser = new User
             {
                 UserName = request.UserName,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
                 Bio = request.Bio,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                ProfilePictureUrl=ProfilePic.ToString()
             };
 
             var result = await _userManager.CreateAsync(newUser, request.Password);

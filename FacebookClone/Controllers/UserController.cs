@@ -24,7 +24,7 @@ namespace FacebookClone.Api.Controllers
             _mediator = mediator;
         }
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(UserRegisterModel command)
+        public async Task<IActionResult> Register([FromForm]UserRegisterModel command)
         {
             if(ModelState.IsValid)
             {

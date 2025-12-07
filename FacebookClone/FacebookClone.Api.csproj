@@ -21,4 +21,8 @@
     <ProjectReference Include="..\FacebookClone.Core\FacebookClone.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
