@@ -57,7 +57,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
+// CORS for local frontend
+const string FrontendCorsPolicy = "frontend";
+builder.Services.AddCors(o => o.AddPolicy(FrontendCorsPolicy, p =>
+    p.WithOrigins("http://localhost:5173", "https://localhost:5173")
+     .AllowAnyHeader()
+     .AllowAnyMethod()));
 
 var app = builder.Build();
 
@@ -76,7 +81,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors(FrontendCorsPolicy);    
 app.UseAuthentication(); 
 app.UseAuthorization();
 

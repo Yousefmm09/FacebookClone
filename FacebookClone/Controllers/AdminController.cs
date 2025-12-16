@@ -40,7 +40,7 @@ namespace FacebookClone.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("unbanned")]
+        [HttpPut("unbanned")]
         public async Task<IActionResult> UnBannedUser([FromBody] UnbannedUserModel command)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
