@@ -144,7 +144,7 @@ namespace FacebookClone.Service.Implementations
         }
         private async Task<AuthMessage> GenerateJwtToken(User user)
         {
-            var key = Environment.GetEnvironmentVariable("jwt_key");
+            var key = Environment.GetEnvironmentVariable("JWT_KEY");
             var jwt_key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             // creat sign
             var sign = new SigningCredentials(jwt_key, SecurityAlgorithms.HmacSha256);
