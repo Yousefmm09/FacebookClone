@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookClone.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDb))]
-    [Migration("20251204153236_AddPosts_ShareModel")]
-    partial class AddPosts_ShareModel
+    [Migration("20251218184351_Move_to_SqlExpress")]
+    partial class Move_to_SqlExpress
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace FacebookClone.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("comments");
                 });
 
             modelBuilder.Entity("FacebookClone.Data.Entities.FriendRequest", b =>
@@ -128,6 +128,12 @@ namespace FacebookClone.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("BanReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("BannedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
@@ -143,6 +149,9 @@ namespace FacebookClone.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")

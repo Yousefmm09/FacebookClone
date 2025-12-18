@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FacebookClone.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitCreat : Migration
+    public partial class Move_to_SqlExpress : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,9 @@ namespace FacebookClone.Infrastructure.Migrations
                     ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsBanned = table.Column<bool>(type: "bit", nullable: false),
+                    BanReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BannedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -71,7 +74,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,7 +95,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,7 +115,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,13 +133,13 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,7 +159,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,7 +241,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Posts_Posts_ParentPostId",
                         column: x => x.ParentPostId,
@@ -266,11 +269,11 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
-
+                
             migrationBuilder.CreateTable(
-                name: "Comment",
+                name: "comments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -283,24 +286,24 @@ namespace FacebookClone.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comment", x => x.Id);
+                    table.PrimaryKey("PK_comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comment_AspNetUsers_UserId",
+                        name: "FK_comments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Comment_Comment_ParentCommentId",
-                        column: x => x.ParentCommentId,
-                        principalTable: "Comment",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Comment_Posts_PostId",
+                        name: "FK_comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "Id",
+                        principalColumn: "Id",      
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_comments_comments_ParentCommentId",
+                        column: x => x.ParentCommentId,
+                        principalTable: "comments",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -321,7 +324,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Likes_Posts_PostId",
                         column: x => x.PostId,
@@ -345,6 +348,33 @@ namespace FacebookClone.Infrastructure.Migrations
                     table.PrimaryKey("PK_PostMedia", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PostMedia_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "postsShares",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_postsShares", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_postsShares_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_postsShares_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
@@ -391,18 +421,18 @@ namespace FacebookClone.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_ParentCommentId",
-                table: "Comment",
+                name: "IX_comments_ParentCommentId",
+                table: "comments",
                 column: "ParentCommentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_PostId",
-                table: "Comment",
+                name: "IX_comments_PostId",
+                table: "comments",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_UserId",
-                table: "Comment",
+                name: "IX_comments_UserId",
+                table: "comments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -451,6 +481,16 @@ namespace FacebookClone.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_postsShares_PostId",
+                table: "postsShares",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_postsShares_UserId",
+                table: "postsShares",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_userRefreshToken_UserId",
                 table: "userRefreshToken",
                 column: "UserId");
@@ -475,7 +515,7 @@ namespace FacebookClone.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Comment");
+                name: "comments");
 
             migrationBuilder.DropTable(
                 name: "friendRequests");
@@ -488,6 +528,9 @@ namespace FacebookClone.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PostMedia");
+
+            migrationBuilder.DropTable(
+                name: "postsShares");
 
             migrationBuilder.DropTable(
                 name: "userRefreshToken");
