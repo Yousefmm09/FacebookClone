@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FacebookClone.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Move_to_SqlExpress : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -271,7 +271,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
-                
+
             migrationBuilder.CreateTable(
                 name: "comments",
                 columns: table => new
@@ -297,7 +297,7 @@ namespace FacebookClone.Infrastructure.Migrations
                         name: "FK_comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "Id",      
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_comments_comments_ParentCommentId",

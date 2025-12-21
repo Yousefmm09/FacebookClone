@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookClone.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDb))]
-    [Migration("20251218184351_Move_to_SqlExpress")]
-    partial class Move_to_SqlExpress
+    [Migration("20251221170433_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Post.Queries.Models
 {
-    public class GetPostByIdQuery:IRequest<PostDto>
-    {
-        public int PostId { get; set; }
-    }
+    public record GetPostsPagedQuery(int PageNumber = 1, int PageSize = 10)
+     : IRequest<List<PostDto>>;
 }

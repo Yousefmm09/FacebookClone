@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Post.Queries.Handlers
 {
-    public class GetPosByIdQueryHandler : IRequestHandler<GetPosByIdQuery, PostDto>
+    public class GetPostByIdQueryHandler : IRequestHandler<GetPostByIdQuery, PostDto>
     {
         private readonly IPostService _postService; 
-        public GetPosByIdQueryHandler(IPostService postService)
+        public GetPostByIdQueryHandler(IPostService postService)
         {
             _postService = postService;
         }
-        public async Task<PostDto> Handle(GetPosByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PostDto> Handle(GetPostByIdQuery request, CancellationToken cancellationToken)
         {
             var getPost =  await _postService.GetPostById(request.PostId);
             return new PostDto

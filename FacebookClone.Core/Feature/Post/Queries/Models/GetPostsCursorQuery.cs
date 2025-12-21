@@ -1,4 +1,4 @@
-﻿using FacebookClone.Core.Feature.Posts.DTOs;
+﻿using FacebookClone.Service.Dto;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Post.Queries.Models
 {
-    public class GetPostByIdQuery:IRequest<PostDto>
-    {
-        public int PostId { get; set; }
-    }
+    public record GetPostsCursorQuery(int LastId = 0, int PageSize = 5)
+    : IRequest<List<PostCursorDto>>;
+
 }
