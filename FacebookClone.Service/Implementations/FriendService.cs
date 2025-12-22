@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using FacebookClone.Api.Hubs;
+using FacebookClone.Infrastructure.Context;
 
 namespace FacebookClone.Service.Implementations
 {
@@ -18,12 +21,17 @@ namespace FacebookClone.Service.Implementations
         private readonly IFriendsRepository _friendsRepository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<User> _userManager;
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly AppDb _db;
 
-        public FriendService(IFriendsRepository friendsRepository, IHttpContextAccessor httpContext, UserManager<User> userManager)
+        public FriendService(IFriendsRepository friendsRepository, IHttpContextAccessor httpContext, UserManager<User> userManager,
+            IHubContext<NotificationHub> notificationHub, AppDb db)
         {
             _friendsRepository = friendsRepository;
             _contextAccessor = httpContext;
             _userManager = userManager;
+            _notificationHub = notificationHub;
+            _db = db;
         }
 
         private string GetCurrentUserId()
@@ -69,6 +77,10 @@ namespace FacebookClone.Service.Implementations
 
             await _friendsRepository.AcceptFriend(friendship1);
             await _friendsRepository.AcceptFriend(friendship2);
+
+           // notify both users
+           //await NotifyUser(senderId, "FriendAccepted", "Friend request accepted", $"{_userManager.FindByIdAsync(currentUser).Result?.UserName} accepted your request", currentUser);
+           //await NotifyUser(currentUser, "FriendAccepted", "Friend request accepted", $"You are now friends with {_userManager.FindByIdAsync(senderId).Result?.UserName}", senderId);
 
             return new FriendshipDto
             {
@@ -217,6 +229,9 @@ namespace FacebookClone.Service.Implementations
                 Status = FriendRequest.FriendRequestStatus.Pending,
             };
             await _friendsRepository.SendFriendRequest(newRequest);
+
+           // notify receiver
+           //await _notificationService.Notify(receiverId, "FriendRequest", "New friend request", $"{_userManager.FindByIdAsync(senderId).Result?.UserName} sent you a friend request", senderId);
 
             var receiverUser = await _userManager.FindByIdAsync(receiverId);
             return new FriendRequestDto

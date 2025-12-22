@@ -11,6 +11,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using FacebookClone.Api.Hubs;
+using FacebookClone.Infrastructure.Context;
 
 namespace FacebookClone.Service.Implementations
 {
@@ -20,13 +23,18 @@ namespace FacebookClone.Service.Implementations
         private readonly IPostRepository _postRepository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<User> _userManager;
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly AppDb _db;
         public CommentService(ICommentRepository commentRepository,IHttpContextAccessor httpContextAccessor
-            ,IPostRepository postRepository,UserManager<User> userManager)
+            ,IPostRepository postRepository,UserManager<User> userManager,
+            IHubContext<NotificationHub> notificationHub, AppDb db)
         {
             _commentRepository = commentRepository;
             _contextAccessor = httpContextAccessor;
             _postRepository = postRepository;
             _userManager = userManager;
+            _notificationHub = notificationHub;
+            _db = db;
         }
         public async Task<CommentDto> CreatComment(CreateCommentDto commentDto)
         {
@@ -47,6 +55,32 @@ namespace FacebookClone.Service.Implementations
             };
             post.CommentCount += 1;
            await _commentRepository.CreatComment(comment);
+
+            // Notify post owner if different user
+            if (!string.IsNullOrEmpty(post.UserId) && post.UserId != userId)
+            {
+                var notification = new Notifications
+                {
+                    UserId = post.UserId,
+                    Type = "Comment",
+                    Title = "New comment",
+                    Message = "Someone commented on your post",
+                    RelatedId = post.Id.ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+                _db.Notifications.Add(notification);
+                await _db.SaveChangesAsync();
+                await _notificationHub.Clients.Group($"user:{post.UserId}").SendAsync("Notify", new {
+                    id = notification.Id,
+                    type = notification.Type,
+                    title = notification.Title,
+                    message = notification.Message,
+                    relatedId = notification.RelatedId,
+                    createdAt = notification.CreatedAt,
+                    isRead = notification.IsRead
+                });
+            }
             return new CommentDto
             {
                 Content=comment.Content,

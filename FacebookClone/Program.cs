@@ -26,6 +26,9 @@ builder.Services
     .AddServiceRegistration(builder.Configuration);
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, FacebookClone.Api.CustomerProvider.CustomUserIdProvider>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -62,7 +65,8 @@ const string FrontendCorsPolicy = "frontend";
 builder.Services.AddCors(o => o.AddPolicy(FrontendCorsPolicy, p =>
     p.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:5174", "http://localhost:5175")
      .AllowAnyHeader()
-     .AllowAnyMethod()));
+     .AllowAnyMethod()
+     .AllowCredentials()));
 
 var app = builder.Build();
 
@@ -86,5 +90,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<FacebookClone.Api.Hubs.ChatHub>("/hubs/chat");
+app.MapHub<FacebookClone.Api.Hubs.NotificationHub>("/hubs/notifications");
 
 app.Run();
