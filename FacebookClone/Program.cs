@@ -60,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
 // CORS for local frontend
 const string FrontendCorsPolicy = "frontend";
 builder.Services.AddCors(o => o.AddPolicy(FrontendCorsPolicy, p =>
-    p.WithOrigins("http://localhost:5173", "https://localhost:5173")
+    p.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:5174", "http://localhost:5175")
      .AllowAnyHeader()
      .AllowAnyMethod()));
 

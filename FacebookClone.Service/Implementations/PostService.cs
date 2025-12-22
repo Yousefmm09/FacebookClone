@@ -41,7 +41,7 @@ namespace FacebookClone.Service.Implementations
                 CommentCount=postDto.CommentCount,
                 ParentPostId=postDto.ParentPostId,
                 Privacy=postDto.Privacy,
-                CreatedAt=postDto.CreatedAt,
+                CreatedAt=DateTime.UtcNow,
             };
             await _postRepository.CreatPostAsync(newPost);
             var likcount = await _postRepository.LikeCount(userId,newPost.Id);

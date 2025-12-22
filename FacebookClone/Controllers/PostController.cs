@@ -19,7 +19,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreatPostCommandHandler command)
+    public async Task<IActionResult> Create([FromBody] CreatPostCommand command)
         => Ok(await _mediator.Send(command));
 
     [HttpGet]

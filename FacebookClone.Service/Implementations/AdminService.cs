@@ -29,7 +29,7 @@ namespace FacebookClone.Service.Implementations
 
             return user.Select(x => new UserDto
             {
-                Id = x.Id,
+                UserId = x.Id,
                 UserName = x.UserName,
                 CreatedAt = x.CreatedAt,
                 Email = x.Email
