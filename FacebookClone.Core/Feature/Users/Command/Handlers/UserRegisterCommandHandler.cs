@@ -1,78 +1,65 @@
-﻿using FacebookClone.Core.Feature.Users.Command.Models;
+﻿using FacebookClone.Core.Feature.Authentication.Command.Models;
+using FacebookClone.Core.Feature.Users.Command.Models;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
-using FacebookClone.Service.Abstract;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
 
-namespace FacebookClone.Core.Feature.Users.Command.Handlers
+public class UserRegisterCommandHandler
+    : IRequestHandler<UserRegisterModel, string>
 {
-    public class UserRegisterCommandHandler : IRequestHandler<UserRegisterModel, string>
+    private readonly UserManager<User> _userManager;
+    private readonly IFile _file;
+    private readonly IMediator _mediator;
+
+    public UserRegisterCommandHandler(
+        UserManager<User> userManager,
+        IFile file,
+        IMediator mediator)
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IAuthenticationsService _authenticationsService;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IEmailService _emailService;
-        private readonly IFile _file;
-        public UserRegisterCommandHandler(
-            UserManager<User> userManager,
-            IAuthenticationsService authenticationsService,
-            IHttpContextAccessor contextAccessor,
-            IEmailService emailService
-            ,IFile file)
+        _userManager = userManager;
+        _file = file;
+        _mediator = mediator;
+    }
+
+    public async Task<string> Handle(
+        UserRegisterModel request,
+        CancellationToken cancellationToken)
+    {
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
+            return "User already exists";
+
+        if (request.Password != request.ConfirmPassword)
+            return "Passwords do not match";
+
+        var profilePic = await _file.UploadIamge("User", request.Image);
+
+        var user = new User
         {
-            _userManager = userManager;
-            _authenticationsService = authenticationsService;
-            _contextAccessor = contextAccessor;
-            _emailService = emailService;
-            _file = file;
+            UserName = request.UserName,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Bio = request.Bio,
+            CreatedAt = DateTime.UtcNow,
+            ProfilePictureUrl = profilePic.ToString(),
+            EmailConfirmed = false
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return errors;
         }
 
-        public async Task<string> Handle(UserRegisterModel request, CancellationToken cancellationToken)
-        {
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
-                return "The user already exists";
+        await _userManager.AddToRoleAsync(user, "User");
 
-            if (request.Password != request.ConfirmPassword)
-                return "The password does not match the confirmation password";
-            var ProfilePic =  await _file.UploadIamge("User", request.Image);
-            var newUser = new User
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                Bio = request.Bio,
-                CreatedAt = DateTime.UtcNow,
-                ProfilePictureUrl=ProfilePic.ToString()
-            };
+        await _mediator.Send(
+            new CreateOtpEmailCommand(user.Id, user.Email),
+            cancellationToken
+        );
 
-            var result = await _userManager.CreateAsync(newUser, request.Password);
-
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return $"Failed to create user: {errors}";
-            }
-
-            await _userManager.AddToRoleAsync(newUser, "User");
-
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-            var codeBytes = Encoding.UTF8.GetBytes(token);
-            var encodedToken = WebEncoders.Base64UrlEncode(codeBytes);
-
-            var requestContext = _contextAccessor.HttpContext?.Request;
-            if (requestContext == null)
-                return "Cannot generate confirmation link: HttpContext is null";
-
-            var link = $"{requestContext.Scheme}://{requestContext.Host}/api/User/ConfirmEmail?userId={newUser.Id}&token={encodedToken}";
-
-            await _emailService.SendEmail(newUser.Email, link);
-
-            return "The user is registered successfully";
-        }
+        return "User registered successfully. OTP sent to email.";
     }
 }

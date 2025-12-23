@@ -27,6 +27,8 @@ namespace FacebookClone.Infrastructure.Context
         public DbSet<PostsShare> postsShares { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
+        public DbSet<OtpEmail> OtpEmails { get; set; }
+        
         public AppDb(DbContextOptions<AppDb> options): base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

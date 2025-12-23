@@ -3,12 +3,19 @@ using FacebookClone.Data.Entities;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Infrastructure.Context;
+using FacebookClone.Infrastructure.Helper;
 using FacebookClone.Infrastructure.Implementations;
 using FacebookClone.Service.Abstract;
+using FacebookClone.Service.Dto;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,19 +26,26 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static FacebookClone.Service.Implementations.AuthMessage;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FacebookClone.Service.Implementations
 {
     public class AuthenticationsService : IAuthenticationsService
     {
         private readonly UserManager<User> _userManager;
+        private readonly IEmail _emailRepository;
         private readonly IConfiguration _configuration;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        public AuthenticationsService(UserManager<User> userManager,IConfiguration configuration,IRefreshTokenRepository refreshTokenRepository)
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IEmailService _emailService;
+        public AuthenticationsService(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IConfiguration configuration, IRefreshTokenRepository refreshTokenRepository, IEmail emailRepository, IEmailService emailService)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _refreshTokenRepository = refreshTokenRepository;   
+            _refreshTokenRepository = refreshTokenRepository;
+            _emailRepository = emailRepository;
+            _contextAccessor = contextAccessor;
+            _emailService = emailService;
         }
 
         public async Task<AuthMessage> ConfirmEmail(string userId, string token)
@@ -48,20 +62,20 @@ namespace FacebookClone.Service.Implementations
                     return new AuthMessage { Message = "the email is confirmed" };
             }
             return new AuthMessage { Message = "not found user" };
-                    
+
         }
         public async Task<AuthMessage> ResetPassword(string userId, string token, string NewPassword)
         {
-            var user =  await _userManager.FindByIdAsync(userId);
-            if(user != null)
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
             {
                 var decodedBytes = WebEncoders.Base64UrlDecode(token);
                 var decodedToken = Encoding.UTF8.GetString(decodedBytes);
-                var resetpassword= await  _userManager.ResetPasswordAsync(user,decodedToken,NewPassword);
+                var resetpassword = await _userManager.ResetPasswordAsync(user, decodedToken, NewPassword);
                 if (!resetpassword.Succeeded)
                 {
-                    var error=string.Join(",",resetpassword.Errors.Select(x=>x.Description));
-                    return new AuthMessage { Message=$"{error}"};
+                    var error = string.Join(",", resetpassword.Errors.Select(x => x.Description));
+                    return new AuthMessage { Message = $"{error}" };
                 }
                 else
                     return new AuthMessage { Message = "the password is  reseted" };
@@ -70,8 +84,8 @@ namespace FacebookClone.Service.Implementations
         }
         public async Task<AuthMessage> CreateAccessTokenAsync(User user)
         {
-            var token= await GenerateJwtToken(user);
-            var rtoken =  CreatRefreshToken(user);
+            var token = await GenerateJwtToken(user);
+            var rtoken = CreatRefreshToken(user);
             var jwttoken = new UserRefreshToken
             {
                 AccessToken = token.AccessToken,
@@ -80,7 +94,7 @@ namespace FacebookClone.Service.Implementations
                 CreatedAt = DateTime.UtcNow,
                 UserId = user.Id
             };
-             await _refreshTokenRepository.RefreshToken(jwttoken);
+            await _refreshTokenRepository.RefreshToken(jwttoken);
             return new AuthMessage
             {
                 AccessToken = token.AccessToken,
@@ -88,19 +102,19 @@ namespace FacebookClone.Service.Implementations
                 Message = "Tokens generated successfully."
             };
         }
-        public async Task<AuthMessage> CreatRefreshToken( string OldAccessToken, string RefreshToekn )
+        public async Task<AuthMessage> CreatRefreshToken(string OldAccessToken, string RefreshToekn)
         {
-            var jwttoken= new JwtSecurityTokenHandler().ReadJwtToken(OldAccessToken);
-           if(jwttoken==null|| jwttoken.Header.Alg!=SecurityAlgorithms.HmacSha256)
+            var jwttoken = new JwtSecurityTokenHandler().ReadJwtToken(OldAccessToken);
+            if (jwttoken == null || jwttoken.Header.Alg != SecurityAlgorithms.HmacSha256)
                 throw new ArgumentException("Invalid access token.");
 
             if (jwttoken.ValidTo > DateTime.UtcNow)
                 throw new ArgumentException("The access token has not expired yet.");
-            var userId= jwttoken.Claims.FirstOrDefault(x=>x.Type==ClaimTypes.NameIdentifier).Value;
+            var userId = jwttoken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
             if (string.IsNullOrEmpty(userId))
                 throw new ArgumentException("Invalid token payload.");
-            var savedToken= _refreshTokenRepository.GetTableNoTracking().FirstOrDefault(x=>x.AccessToken==OldAccessToken&&
-            x.RefreshTokenSecret==RefreshToekn&&x.UserId==userId);
+            var savedToken = _refreshTokenRepository.GetTableNoTracking().FirstOrDefault(x => x.AccessToken == OldAccessToken &&
+            x.RefreshTokenSecret == RefreshToekn && x.UserId == userId);
             if (savedToken == null)
                 throw new ArgumentException("Refresh token not found or invalid.");
 
@@ -112,14 +126,14 @@ namespace FacebookClone.Service.Implementations
             if (user == null)
                 throw new ArgumentException("User not found.");
             var NewAccessToken = await CreateAccessTokenAsync(user);
-            var NewRefreshToken=  CreatRefreshToken(user);
+            var NewRefreshToken = CreatRefreshToken(user);
             var userRToken = new UserRefreshToken
             {
-                AccessToken=NewAccessToken.AccessToken,
-                RefreshTokenSecret=NewRefreshToken.TokenString,
-                UserId=userId,
-                CreatedAt=DateTime.UtcNow,
-                Expired=NewRefreshToken.ExpireDate,
+                AccessToken = NewAccessToken.AccessToken,
+                RefreshTokenSecret = NewRefreshToken.TokenString,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                Expired = NewRefreshToken.ExpireDate,
             };
             await _refreshTokenRepository.RefreshToken(userRToken);
 
@@ -132,14 +146,14 @@ namespace FacebookClone.Service.Implementations
         }
         private RefreshToken CreatRefreshToken(User user)
         {
-            var random= new byte[32];
-            using var generateRandom= RandomNumberGenerator.Create();
+            var random = new byte[32];
+            using var generateRandom = RandomNumberGenerator.Create();
             generateRandom.GetBytes(random);
             return new RefreshToken
             {
-                UserName=user.UserName,
-                ExpireDate=DateTime.UtcNow.AddMinutes(10),
-                TokenString= Convert.ToBase64String(random)
+                UserName = user.UserName,
+                ExpireDate = DateTime.UtcNow.AddMinutes(10),
+                TokenString = Convert.ToBase64String(random)
             };
         }
         private async Task<AuthMessage> GenerateJwtToken(User user)
@@ -173,6 +187,62 @@ namespace FacebookClone.Service.Implementations
             {
                 AccessToken = accesstoken
             };
+        }
+
+        public async Task<string> CreateOtpAsync(string userId, string email)
+        {
+            var otp = FacebookCloneHelper.CreateOtp();
+            if (string.IsNullOrEmpty(otp))
+                throw new Exception("Failed to generate OTP");
+
+            var otpEntity = new OtpEmail
+            {
+                UserId = userId,
+                OtpHash = FacebookCloneHelper.HashOtp(otp),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                CreatedAt = DateTime.UtcNow,
+                Attempts = 0,
+                IsUsed = false
+            };
+
+            await _emailRepository.CreateAsync(otpEntity);
+
+            await _emailService.SendEmail(email, $"Your OTP code is: {otp}");
+
+            return ("OTP sent successfully");
+        }
+
+        public async Task<string> VerifyOtpAsync(string userId, string code)
+        {
+            var otp = await _emailRepository.GetLatestAsync(userId);
+            if (otp == null)
+                throw new Exception("OTP not found");
+
+            if (otp.ExpiresAt < DateTime.UtcNow)
+                throw new Exception("OTP expired");
+
+            if (otp.Attempts >= 5)
+                throw new Exception("Too many attempts");
+
+            var hashed = FacebookCloneHelper.HashOtp(code);
+
+            if (hashed != otp.OtpHash)
+            {
+                otp.Attempts++;
+                await _emailRepository.UpdateAsync(otp);
+                return ("Invalid OTP");
+            }
+
+            otp.IsUsed = true;
+            await _emailRepository.UpdateAsync(otp);
+            //confirm email
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null && !user.EmailConfirmed)
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+            }
+            return ("OTP verified successfully");
         }
     }
 }

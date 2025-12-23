@@ -26,15 +26,6 @@ namespace FacebookClone.Api.Controllers
             _context = context;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] UserRegisterModel command)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginModel command)
         {
@@ -126,5 +117,62 @@ namespace FacebookClone.Api.Controllers
                 ? Ok(result)
                 : BadRequest(result);
         }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromForm] UserRegisterModel command)
+        {
+            var result = await _mediator.Send(command);
+            return result.Contains("success", StringComparison.OrdinalIgnoreCase)
+                ? Ok(result)
+                : BadRequest(result);
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp(string userId, string code)
+        {
+            var result = await _mediator.Send(
+                new VerifyOtpEmailCommand(userId, code)
+            );
+
+            return result.Contains("success", StringComparison.OrdinalIgnoreCase)
+                         ? Ok(result)
+                         : BadRequest(result);
+        }
+        [ApiController]
+        [Route("api/otp")]
+        public class OtpController : ControllerBase
+        {
+            private readonly IMediator _mediator;
+
+            public OtpController(IMediator mediator)
+            {
+                _mediator = mediator;
+            }
+
+            [HttpPost("send")]
+            public async Task<IActionResult> SendOtp(string userId, string email)
+            {
+                var result = await _mediator.Send(
+                    new CreateOtpEmailCommand(userId, email)
+                );
+
+                return result.Contains("success", StringComparison.OrdinalIgnoreCase)
+                        ? Ok(result)
+                        : BadRequest(result);
+            }
+
+            [HttpPost("verify")]
+            public async Task<IActionResult> VerifyOtp(string userId, string code)
+            {
+                var result = await _mediator.Send(
+                    new VerifyOtpEmailCommand(userId, code)
+                );
+
+                return result.Contains("success", StringComparison.OrdinalIgnoreCase)
+                         ? Ok(result)
+                         : BadRequest(result);
+            }
+        }
+
+
     }
 }
