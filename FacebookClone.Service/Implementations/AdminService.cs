@@ -53,7 +53,7 @@ namespace FacebookClone.Service.Implementations
                 {
                     Message = "The user is unbanned Successfully"
                 };
-            return new MessageDto { Message = "The user is not unbanned" };
+            return new MessageDto { Message = "The user is not banned" };
         }
 
         public async Task<UserDto> GetUserDetails(string userId)
