@@ -23,10 +23,11 @@ namespace FacebookClone.Infrastructure.Implementations
             return comment;
         }
 
-        public async Task<Comment> GetCommentById(int id)
+        public async Task<Comment> GetCommentUser(int Commentid)
         {
-            var comment=   _appDb.comments.Where(x=>x.Id==id).FirstOrDefault();
+            var comment=   _appDb.comments.Where(x=>x.Id==Commentid).FirstOrDefault();
                 return comment;
+           
                 
         }
 
@@ -66,5 +67,6 @@ namespace FacebookClone.Infrastructure.Implementations
             return Task.FromResult(userComment);
         }
 
+       
     }
 }

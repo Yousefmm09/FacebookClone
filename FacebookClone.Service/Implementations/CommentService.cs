@@ -100,8 +100,8 @@ namespace FacebookClone.Service.Implementations
             if (userComment == null)
                 return $"not found comment by  {_userManager.Users.FirstOrDefault(x => x.Id == userId)?.UserName}";
 
-            var commentUser = await _commentRepository.GetCommentById(commentId);
-            if (commentUser!=null )
+            var commentUser = await _commentRepository.GetCommentUser(commentId);
+            if (commentUser!=null&&commentUser.UserId==userId)
             {
                 commentUser.Content = comment.Content;
                 commentUser.CreatedAt = DateTime.Now;
@@ -114,7 +114,11 @@ namespace FacebookClone.Service.Implementations
 
         public async Task<CommentDto> GetCommentById(int id)
         {
-            var comment= await _commentRepository.GetCommentById(id);
+            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("User not authenticated");
+
+            var comment= await _commentRepository.GetCommentUser(id);
             if (comment == null)
                 throw new Exception("the comment not found");
             return new CommentDto
@@ -153,7 +157,7 @@ namespace FacebookClone.Service.Implementations
             var userComment=await _commentRepository.UserComment(userId);
             if (userComment == null)
                 return $"not found comment by  {_userManager.Users.FirstOrDefault(x => x.Id == userId)?.UserName}";
-            var comment = await _commentRepository.GetCommentById(id);
+            var comment = await _commentRepository.GetCommentUser(id);
             if (comment == null)
                 throw new Exception("Comment not found");
 

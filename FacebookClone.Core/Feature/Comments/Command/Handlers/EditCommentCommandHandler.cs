@@ -1,5 +1,6 @@
 ﻿using FacebookClone.Core.Feature.Comments.Command.Models;
 using FacebookClone.Infrastructure.Abstract;
+using FacebookClone.Service.Abstract;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,21 @@ namespace FacebookClone.Core.Feature.Comments.Command.Handlers
 {
     public class EditCommentCommandHandler : IRequestHandler<EditCommentCommand, string>
     {
-        private readonly ICommentRepository _commentRepository;
-        public EditCommentCommandHandler(ICommentRepository commentRepository)
+        private readonly ICommentService commentService;
+        public EditCommentCommandHandler(ICommentService commentService)
         {
-            _commentRepository = commentRepository;
+            this.commentService = commentService;
         }
         public async Task<string> Handle(EditCommentCommand request, CancellationToken cancellationToken)
         {
-            var comment = await _commentRepository.GetCommentById(request.CommentId);
+            var comment = await commentService.GetCommentById(request.CommentId);
             if (comment == null)
             {
                 throw new Exception("Comment not found");
             }
             comment.Content = request.Content;
-            await _commentRepository.EditComment(request.CommentId,comment);
-            return "Comment updated successfully";
+             var res= await commentService.EditComment(request.CommentId,comment);
+                return res;
         }
     }
 }
