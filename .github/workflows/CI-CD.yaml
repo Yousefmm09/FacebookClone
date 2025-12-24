@@ -1,4 +1,4 @@
-name: .NET CI
+name: .NET CI/CD
 
 on:
   push:
@@ -26,3 +26,27 @@ jobs:
 
       - name: Run tests
         run: dotnet test --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish -c Release -o publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-publish
+          path: publish/
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api-publish
+
+      - name: Deploy
+        run: |
+          echo "Deploying API..."
+          dir
