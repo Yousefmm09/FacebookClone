@@ -1,13 +1,11 @@
 using FacebookClone.Core;
+using FacebookClone.Core.Middleware;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure;
 using FacebookClone.Infrastructure.Context;
 using FacebookClone.Infrastructure.Seeder;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,15 +76,15 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedAsync(roleManager, userManager);
 }
 
-if (app.Environment.IsProduction())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
-app.UseCors(FrontendCorsPolicy);    
-app.UseAuthentication(); 
+app.UseCors(FrontendCorsPolicy);
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
