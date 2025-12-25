@@ -22,10 +22,8 @@ namespace FacebookClone.Core.Behaviors
 
                 if (failures.Count != 0)
                 {
-                    var message = failures.Select(x => x.PropertyName + ": " + x.ErrorMessage).FirstOrDefault();
-
-                    throw new ValidationException(message);
-
+                    var message = failures.Select(x => x.PropertyName + ": " + x.ErrorMessage).ToList();
+                    throw new ValidationException($"{string.Join(", ", message)}", failures);
                 }
             }
             return await next();

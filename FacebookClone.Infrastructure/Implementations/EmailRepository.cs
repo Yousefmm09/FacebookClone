@@ -1,14 +1,7 @@
 using FacebookClone.Data.Entities;
-using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
 using FacebookClone.Infrastructure.Context;
-using FacebookClone.Infrastructure.Helper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 namespace FacebookClone.Infrastructure.Implementations
 {
     public class EmailRepository : IEmail

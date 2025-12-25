@@ -57,7 +57,7 @@ namespace FacebookClone.Api.Controllers
                 user.CreatedAt
             });
         }
-//search
+        //search
         [Authorize]
         [HttpGet("search")]
         public IActionResult Search([FromQuery] string q = "", [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
@@ -127,10 +127,10 @@ namespace FacebookClone.Api.Controllers
         }
 
         [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtp(string userId, string code)
+        public async Task<IActionResult> VerifyOtp(string userName, string code)
         {
             var result = await _mediator.Send(
-                new VerifyOtpEmailCommand(userId, code)
+                new VerifyOtpEmailCommand(userName, code)
             );
 
             return result.Contains("success", StringComparison.OrdinalIgnoreCase)
@@ -161,10 +161,10 @@ namespace FacebookClone.Api.Controllers
             }
 
             [HttpPost("verify")]
-            public async Task<IActionResult> VerifyOtp(string userId, string code)
+            public async Task<IActionResult> VerifyOtp(string userName, string code)
             {
                 var result = await _mediator.Send(
-                    new VerifyOtpEmailCommand(userId, code)
+                    new VerifyOtpEmailCommand(userName, code)
                 );
 
                 return result.Contains("success", StringComparison.OrdinalIgnoreCase)

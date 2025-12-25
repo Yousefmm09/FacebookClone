@@ -1,32 +1,18 @@
-﻿using Azure.Core;
-using FacebookClone.Data.Entities;
+﻿using FacebookClone.Data.Entities;
 using FacebookClone.Data.Entities.Identity;
 using FacebookClone.Infrastructure.Abstract;
-using FacebookClone.Infrastructure.Context;
 using FacebookClone.Infrastructure.Helper;
-using FacebookClone.Infrastructure.Implementations;
 using FacebookClone.Service.Abstract;
-using FacebookClone.Service.Dto;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MimeKit.Cryptography;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using static FacebookClone.Service.Implementations.AuthMessage;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FacebookClone.Service.Implementations
 {
@@ -195,9 +181,14 @@ namespace FacebookClone.Service.Implementations
             if (string.IsNullOrEmpty(otp))
                 throw new Exception("Failed to generate OTP");
 
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found");
+
             var otpEntity = new OtpEmail
             {
                 UserId = userId,
+                User = user,
                 OtpHash = FacebookCloneHelper.HashOtp(otp),
                 ExpiresAt = DateTime.UtcNow.AddMinutes(5),
                 CreatedAt = DateTime.UtcNow,
@@ -212,8 +203,10 @@ namespace FacebookClone.Service.Implementations
             return ("OTP sent successfully");
         }
 
-        public async Task<string> VerifyOtpAsync(string userId, string code)
+        public async Task<string> VerifyOtpAsync(string userName, string code)
         {
+            var userId = await GetUserNameAsync(userName);
+
             var otp = await _emailRepository.GetLatestAsync(userId);
             if (otp == null)
                 throw new Exception("OTP not found");
@@ -236,13 +229,21 @@ namespace FacebookClone.Service.Implementations
             otp.IsUsed = true;
             await _emailRepository.UpdateAsync(otp);
             //confirm email
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByNameAsync(userName);
             if (user != null && !user.EmailConfirmed)
             {
                 user.EmailConfirmed = true;
                 await _userManager.UpdateAsync(user);
             }
             return ("OTP verified successfully");
+        }
+        private async Task<string> GetUserNameAsync(string UserName)
+        {
+            var user = await _userManager.FindByNameAsync(UserName);
+            var userName = await _userManager.GetUserIdAsync(user);
+            if (user == null)
+                throw new Exception("User not found");
+            return userName;
         }
     }
 }

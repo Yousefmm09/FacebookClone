@@ -2,20 +2,12 @@
 using FacebookClone.Data.Entities.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FacebookClone.Infrastructure.Context
 {
-    public class AppDb:IdentityDbContext<User>
+    public class AppDb : IdentityDbContext<User>
     {
-        public AppDb()
-        {
-            
-        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Comment> comments { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -28,8 +20,8 @@ namespace FacebookClone.Infrastructure.Context
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
         public DbSet<OtpEmail> OtpEmails { get; set; }
-        
-        public AppDb(DbContextOptions<AppDb> options): base(options) { }
+
+        public AppDb(DbContextOptions<AppDb> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -55,7 +47,7 @@ namespace FacebookClone.Infrastructure.Context
                 .WithMany(u => u.ReceiveRequests)
                 .HasForeignKey(fr => fr.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
-         
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Like>()
@@ -63,11 +55,11 @@ namespace FacebookClone.Infrastructure.Context
                 .WithMany(p => p.Likes)
                 .HasForeignKey(l => l.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
-       
+
+
+
+        }
 
 
     }
-
-
-}
 }
