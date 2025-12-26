@@ -2,11 +2,6 @@
 using FacebookClone.Core.Feature.Posts.DTOs;
 using FacebookClone.Service.Abstract;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Post.Command.Handlers
 {
@@ -19,6 +14,7 @@ namespace FacebookClone.Core.Feature.Post.Command.Handlers
         }
         public Task<PostDto> Handle(CreatPostCommand request, CancellationToken cancellationToken)
         {
+
             var post = _postService.CreatPostAsync(new PostDto
             {
                 Content = request.Content,

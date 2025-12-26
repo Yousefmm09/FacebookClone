@@ -3,5 +3,6 @@
   <Project Path="FacebookClone.Data/FacebookClone.Data.csproj" />
   <Project Path="FacebookClone.Infrastructure/FacebookClone.Infrastructure.csproj" />
   <Project Path="FacebookClone.Service/FacebookClone.Service.csproj" />
+  <Project Path="FacebookClone.xUnitTest/FacebookClone.xUnitTest.csproj" Id="02e4dd89-08c2-47e4-b69e-0c68916fc4fd" />
   <Project Path="FacebookClone/FacebookClone.Api.csproj" />
 </Solution>

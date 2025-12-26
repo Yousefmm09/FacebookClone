@@ -1,11 +1,6 @@
 ﻿using FacebookClone.Core.Feature.Post.Command.Models;
 using FacebookClone.Service.Abstract;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FacebookClone.Core.Feature.Post.Command.Handlers
 {
@@ -18,7 +13,7 @@ namespace FacebookClone.Core.Feature.Post.Command.Handlers
         }
         public async Task<string> Handle(DeletePostCommand request, CancellationToken cancellationToken)
         {
-            var deletePost =  await _postService.DeletePost(request.PostId);
+            var deletePost = await _postService.DeletePost(request.PostId);
             if (deletePost != null)
             {
                 return deletePost;
