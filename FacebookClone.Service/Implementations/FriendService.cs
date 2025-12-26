@@ -5,6 +5,7 @@ using FacebookClone.Service.Abstract;
 using FacebookClone.Service.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,22 +24,32 @@ namespace FacebookClone.Service.Implementations
         private readonly UserManager<User> _userManager;
         private readonly IHubContext<NotificationHub> _notificationHub;
         private readonly AppDb _db;
+        private readonly ILogger<FriendService> _logger;
 
-        public FriendService(IFriendsRepository friendsRepository, IHttpContextAccessor httpContext, UserManager<User> userManager,
-            IHubContext<NotificationHub> notificationHub, AppDb db)
+        public FriendService(
+            IFriendsRepository friendsRepository, 
+            IHttpContextAccessor httpContext, 
+            UserManager<User> userManager,
+            IHubContext<NotificationHub> notificationHub, 
+            AppDb db,
+            ILogger<FriendService> logger)
         {
             _friendsRepository = friendsRepository;
             _contextAccessor = httpContext;
             _userManager = userManager;
             _notificationHub = notificationHub;
             _db = db;
+            _logger = logger;
         }
 
         private string GetCurrentUserId()
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
-                throw new Exception("User not authenticated");
+            {
+                _logger.LogWarning("Attempt to access friend service without authentication");
+                throw new UnauthorizedAccessException("User not authenticated");
+            }
             return userId;
         }
 
@@ -47,16 +58,27 @@ namespace FacebookClone.Service.Implementations
             var currentUser = GetCurrentUserId();
             var senderId = friendRequest.UserId;
 
+            _logger.LogInformation("Attempting to accept friend request. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, currentUser);
+
             var request = await _friendsRepository.GetFriendRequest(senderId, currentUser);
 
             if (request == null)
-                throw new Exception("Friend request not found");
+            {
+                _logger.LogWarning("Friend request not found. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, currentUser);
+                throw new KeyNotFoundException("Friend request not found");
+            }
 
             if (request.Status == FriendRequest.FriendRequestStatus.Accepted)
-                throw new Exception("Friend request already accepted");
+            {
+                _logger.LogWarning("Friend request already accepted. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, currentUser);
+                throw new InvalidOperationException("Friend request already accepted");
+            }
 
             if (request.Status == FriendRequest.FriendRequestStatus.Rejected)
-                throw new Exception("Friend request was rejected before and can't be accepted");
+            {
+                _logger.LogWarning("Attempt to accept rejected friend request. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, currentUser);
+                throw new InvalidOperationException("Friend request was rejected before and can't be accepted");
+            }
 
             request.Status = FriendRequest.FriendRequestStatus.Accepted;
             await _friendsRepository.UpdateFriendRequest(request);
@@ -77,6 +99,8 @@ namespace FacebookClone.Service.Implementations
 
             await _friendsRepository.AcceptFriend(friendship1);
             await _friendsRepository.AcceptFriend(friendship2);
+
+            _logger.LogInformation("Friend request accepted successfully. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, currentUser);
 
            // notify both users
            //await NotifyUser(senderId, "FriendAccepted", "Friend request accepted", $"{_userManager.FindByIdAsync(currentUser).Result?.UserName} accepted your request", currentUser);
@@ -121,11 +145,19 @@ namespace FacebookClone.Service.Implementations
             var senderId = GetCurrentUserId();
             var receiverId = friendRequest.ReceiverId;
 
+            _logger.LogInformation("Attempting to send friend request. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, receiverId);
+
             if (string.IsNullOrEmpty(receiverId))
-                throw new Exception("Receiver not found");
+            {
+                _logger.LogWarning("Receiver ID is null or empty");
+                throw new ArgumentException("Receiver not found");
+            }
 
             if (receiverId == senderId)
-                throw new Exception("You cannot send a request to yourself");
+            {
+                _logger.LogWarning("User attempting to send friend request to themselves. UserId: {UserId}", senderId);
+                throw new InvalidOperationException("You cannot send a request to yourself");
+            }
             // Check reverse request (Receiver had sent before)
             var reverseRequest = await _friendsRepository.GetFriendRequest(receiverId, senderId);
 
@@ -229,6 +261,8 @@ namespace FacebookClone.Service.Implementations
                 Status = FriendRequest.FriendRequestStatus.Pending,
             };
             await _friendsRepository.SendFriendRequest(newRequest);
+
+            _logger.LogInformation("Friend request sent successfully. SenderId: {SenderId}, ReceiverId: {ReceiverId}", senderId, receiverId);
 
            // notify receiver
            //await _notificationService.Notify(receiverId, "FriendRequest", "New friend request", $"{_userManager.FindByIdAsync(senderId).Result?.UserName} sent you a friend request", senderId);

@@ -6,6 +6,7 @@ using FacebookClone.Service.Abstract;
 using FacebookClone.Service.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,19 +22,31 @@ namespace FacebookClone.Service.Implementations
         private readonly UserManager<User> _userManage;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ILikeRepository _likeRepository;
-        public PostService(IPostRepository postRepository,UserManager<User> userManager,
-            IHttpContextAccessor httpContextAccessor,ILikeRepository likeRepository)
+        private readonly ILogger<PostService> _logger;
+
+        public PostService(
+            IPostRepository postRepository,
+            UserManager<User> userManager,
+            IHttpContextAccessor httpContextAccessor,
+            ILikeRepository likeRepository,
+            ILogger<PostService> logger)
         {
             _postRepository=postRepository;
             _userManage=userManager;
             _contextAccessor=httpContextAccessor;
             _likeRepository=likeRepository;
+            _logger=logger;
         }
         public async Task<PostDto> CreatPostAsync(PostDto postDto)
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
-                throw new Exception("User not authenticated");
+            {
+                _logger.LogWarning("Attempt to create post without authentication");
+                throw new UnauthorizedAccessException("User not authenticated");
+            }
+
+            _logger.LogInformation("Creating new post for user: {UserId}", userId);
             var newPost = new Post
             {
                 UserId = userId,
@@ -45,6 +58,7 @@ namespace FacebookClone.Service.Implementations
             };
             await _postRepository.CreatPostAsync(newPost);
             var likcount = await _postRepository.LikeCount(userId,newPost.Id);
+            _logger.LogInformation("Post created successfully. PostId: {PostId}, UserId: {UserId}", newPost.Id, userId);
             return new PostDto
             {
                 PostId=newPost.Id,
@@ -63,23 +77,29 @@ namespace FacebookClone.Service.Implementations
         public async Task<string> DeletePost(int postId)
         {
             var user =_contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _logger.LogInformation("Attempting to delete post. PostId: {PostId}, UserId: {UserId}", postId, user);
             var post= await _postRepository.GetPostById(postId);
             var userId =   _userManage.Users.FirstOrDefault(x => x.Id == user);
             if (userId != null)
             {
                 var UserPost = await _postRepository.DeletePost(postId);
-                
+                _logger.LogInformation("Post deleted successfully. PostId: {PostId}, UserId: {UserId}", postId, user);
                 return "the post delete successfully";
             }
-            throw new Exception("User not authenticated");
+            _logger.LogWarning("Attempt to delete post without authentication. PostId: {PostId}", postId);
+            throw new UnauthorizedAccessException("User not authenticated");
         }
 
         public async Task<PostDto> GetPostById(int postId)
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _logger.LogDebug("Fetching post by ID. PostId: {PostId}, UserId: {UserId}", postId, userId);
             var post = await _postRepository.GetPostById(postId);
             if (post == null)
-                throw new Exception("Post not found");
+            {
+                _logger.LogWarning("Post not found. PostId: {PostId}", postId);
+                throw new KeyNotFoundException($"Post with ID {postId} not found");
+            }
             var likcount = await _postRepository.LikeCount(userId,postId);
             var showPost = new PostDto
             {
@@ -87,6 +107,7 @@ namespace FacebookClone.Service.Implementations
                 Privacy = post.Privacy,
                 LikeCount = likcount,
             };
+            _logger.LogDebug("Post retrieved successfully. PostId: {PostId}", postId);
             return showPost;
         }
 
@@ -94,13 +115,25 @@ namespace FacebookClone.Service.Implementations
         {
             var user = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (user == null)
-                throw new Exception("the user not authoraized");
+            {
+                _logger.LogWarning("Attempt to share post without authentication. PostId: {PostId}", PostId);
+                throw new UnauthorizedAccessException("User not authorized");
+            }
+
+            _logger.LogInformation("Attempting to share post. PostId: {PostId}, UserId: {UserId}", PostId, user);
             var getPost = await _postRepository.GetPostById(PostId);
             if (getPost == null)
-             throw new Exception("Not found post");
+            {
+                _logger.LogWarning("Post not found for sharing. PostId: {PostId}", PostId);
+                throw new KeyNotFoundException("Post not found");
+            }
+
             var existingShare = await _postRepository.GetPostShare(PostId, user);
             if (existingShare != null)
-                throw new Exception("You have already shared this post");
+            {
+                _logger.LogWarning("User already shared this post. PostId: {PostId}, UserId: {UserId}", PostId, user);
+                throw new InvalidOperationException("You have already shared this post");
+            }
 
             var share = new PostsShare
             {
@@ -109,9 +142,9 @@ namespace FacebookClone.Service.Implementations
                 CreatedAt = DateTime.Now,
             };
            
-
             getPost.ShareCount += 1;
             await _postRepository.SharePost(share);
+            _logger.LogInformation("Post shared successfully. PostId: {PostId}, UserId: {UserId}", PostId, user);
             return new PostShareDto
             {
                 Id = share.Id,
@@ -125,19 +158,33 @@ namespace FacebookClone.Service.Implementations
         {
             var user = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(user == null)
-            throw new Exception("the user not authoraized");
-            var getPost= await _postRepository.GetPostById(postId);
-            if(getPost.UserId!=user)
-                throw new Exception("You are not allowed to edit this post");
-            if (getPost != null)
             {
-              getPost.Content = postDto.Content;
-                getPost.Privacy = postDto.Privacy;
-                getPost.UpdatedAt = DateTime.Now;
-                await _postRepository.UpdatePost(getPost, postId);
-                return "Post updated successfully";
+                _logger.LogWarning("Attempt to update post without authentication. PostId: {PostId}", postId);
+                throw new UnauthorizedAccessException("User not authorized");
             }
-            throw new Exception("the post not updated");
+
+            _logger.LogInformation("Attempting to update post. PostId: {PostId}, UserId: {UserId}", postId, user);
+            var getPost= await _postRepository.GetPostById(postId);
+            
+            if(getPost == null)
+            {
+                _logger.LogWarning("Post not found for update. PostId: {PostId}", postId);
+                throw new KeyNotFoundException("Post not found");
+            }
+
+            if(getPost.UserId!=user)
+            {
+                _logger.LogWarning("User not authorized to edit post. PostId: {PostId}, UserId: {UserId}, PostOwnerId: {PostOwnerId}", 
+                    postId, user, getPost.UserId);
+                throw new UnauthorizedAccessException("You are not allowed to edit this post");
+            }
+
+            getPost.Content = postDto.Content;
+            getPost.Privacy = postDto.Privacy;
+            getPost.UpdatedAt = DateTime.Now;
+            await _postRepository.UpdatePost(getPost, postId);
+            _logger.LogInformation("Post updated successfully. PostId: {PostId}, UserId: {UserId}", postId, user);
+            return "Post updated successfully";
         }
     }
 }

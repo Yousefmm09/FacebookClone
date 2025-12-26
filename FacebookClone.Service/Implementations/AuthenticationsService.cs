@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,7 +25,16 @@ namespace FacebookClone.Service.Implementations
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IEmailService _emailService;
-        public AuthenticationsService(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IConfiguration configuration, IRefreshTokenRepository refreshTokenRepository, IEmail emailRepository, IEmailService emailService)
+        private readonly ILogger<AuthenticationsService> _logger;
+
+        public AuthenticationsService(
+            UserManager<User> userManager, 
+            IHttpContextAccessor contextAccessor, 
+            IConfiguration configuration, 
+            IRefreshTokenRepository refreshTokenRepository, 
+            IEmail emailRepository, 
+            IEmailService emailService,
+            ILogger<AuthenticationsService> logger)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -32,21 +42,28 @@ namespace FacebookClone.Service.Implementations
             _emailRepository = emailRepository;
             _contextAccessor = contextAccessor;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<AuthMessage> ConfirmEmail(string userId, string token)
         {
+            _logger.LogInformation("Attempting to confirm email for user: {UserId}", userId);
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 var confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
-                if (confirmEmail != null)
+                if (confirmEmail.Succeeded)
                 {
+                    _logger.LogInformation("Email confirmed successfully for user: {UserId}", userId);
                     return new AuthMessage { Message = "the email is confirmed" };
                 }
                 else
+                {
+                    _logger.LogWarning("Email confirmation failed for user: {UserId}", userId);
                     return new AuthMessage { Message = "the email is confirmed" };
+                }
             }
+            _logger.LogWarning("User not found for email confirmation: {UserId}", userId);
             return new AuthMessage { Message = "not found user" };
 
         }
@@ -70,6 +87,7 @@ namespace FacebookClone.Service.Implementations
         }
         public async Task<AuthMessage> CreateAccessTokenAsync(User user)
         {
+            _logger.LogInformation("Creating access token for user: {UserId}", user.Id);
             var token = await GenerateJwtToken(user);
             var rtoken = CreatRefreshToken(user);
             var jwttoken = new UserRefreshToken
@@ -81,6 +99,7 @@ namespace FacebookClone.Service.Implementations
                 UserId = user.Id
             };
             await _refreshTokenRepository.RefreshToken(jwttoken);
+            _logger.LogInformation("Access token created successfully for user: {UserId}", user.Id);
             return new AuthMessage
             {
                 AccessToken = token.AccessToken,
@@ -177,13 +196,20 @@ namespace FacebookClone.Service.Implementations
 
         public async Task<string> CreateOtpAsync(string userId, string email)
         {
+            _logger.LogInformation("Creating OTP for user: {UserId}, Email: {Email}", userId, email);
             var otp = FacebookCloneHelper.CreateOtp();
             if (string.IsNullOrEmpty(otp))
+            {
+                _logger.LogError("Failed to generate OTP for user: {UserId}", userId);
                 throw new Exception("Failed to generate OTP");
+            }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
+            {
+                _logger.LogWarning("User not found when creating OTP: {UserId}", userId);
                 throw new Exception("User not found");
+            }
 
             var otpEntity = new OtpEmail
             {
@@ -200,22 +226,33 @@ namespace FacebookClone.Service.Implementations
 
             await _emailService.SendEmail(email, $"Your OTP code is: {otp}");
 
+            _logger.LogInformation("OTP sent successfully to email: {Email} for user: {UserId}", email, userId);
             return ("OTP sent successfully");
         }
 
         public async Task<string> VerifyOtpAsync(string userName, string code)
         {
+            _logger.LogInformation("Verifying OTP for user: {UserName}", userName);
             var userId = await GetUserNameAsync(userName);
 
             var otp = await _emailRepository.GetLatestAsync(userId);
             if (otp == null)
+            {
+                _logger.LogWarning("OTP not found for user: {UserName}", userName);
                 throw new Exception("OTP not found");
+            }
 
             if (otp.ExpiresAt < DateTime.UtcNow)
+            {
+                _logger.LogWarning("OTP expired for user: {UserName}", userName);
                 throw new Exception("OTP expired");
+            }
 
             if (otp.Attempts >= 5)
+            {
+                _logger.LogWarning("Too many OTP attempts for user: {UserName}", userName);
                 throw new Exception("Too many attempts");
+            }
 
             var hashed = FacebookCloneHelper.HashOtp(code);
 
@@ -223,6 +260,7 @@ namespace FacebookClone.Service.Implementations
             {
                 otp.Attempts++;
                 await _emailRepository.UpdateAsync(otp);
+                _logger.LogWarning("Invalid OTP provided for user: {UserName}, Attempt: {Attempts}", userName, otp.Attempts);
                 return ("Invalid OTP");
             }
 
@@ -234,7 +272,9 @@ namespace FacebookClone.Service.Implementations
             {
                 user.EmailConfirmed = true;
                 await _userManager.UpdateAsync(user);
+                _logger.LogInformation("Email confirmed via OTP for user: {UserName}", userName);
             }
+            _logger.LogInformation("OTP verified successfully for user: {UserName}", userName);
             return ("OTP verified successfully");
         }
         private async Task<string> GetUserNameAsync(string UserName)
