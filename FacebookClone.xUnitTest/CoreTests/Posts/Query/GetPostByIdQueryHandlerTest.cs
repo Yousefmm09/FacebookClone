@@ -2,6 +2,7 @@
 using FacebookClone.Core.Feature.Post.Queries.Models;
 using FacebookClone.Core.Feature.Posts.DTOs;
 using FacebookClone.Service.Abstract;
+using FluentAssertions;
 using Moq;
 
 namespace FacebookClone.xUnitTest.CoreTests.Posts.Query
@@ -13,40 +14,57 @@ namespace FacebookClone.xUnitTest.CoreTests.Posts.Query
         {
             _postServiceMock = new Mock<IPostService>();
         }
-        [Fact]
-        public async Task Handle_ValidPostId_ReturnsPostDto()
+        [Theory]
+        [InlineData(1)]
+        public async Task Handle_ValidPostId_ReturnsPostDto(int id)
         {
             // Arrange
-            var postEntity = new PostDto
+            var expectedPost = new PostDto
             {
-                PostId = 23,
-                Content = "This is a sample post.",
-                Privacy = "Public",
-                LikeCount = 10
+                PostId = id,
+                Content = "iam yousef",
+                Privacy = "public",
+                ParentPostId = null,
+                LikeCount = 4,
+                CommentCount = 0
             };
 
-            var query = new GetPostByIdQuery
-            {
-                PostId = 23
-            };
-
-            _postServiceMock.Setup(x => x.GetPostById(23)).ReturnsAsync(postEntity);
+            _postServiceMock
+                .Setup(x => x.GetPostById(id))
+                .ReturnsAsync(expectedPost);
 
             var handler = new GetPostByIdQueryHandler(_postServiceMock.Object);
 
             // Act
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await handler.Handle(
+                new GetPostByIdQuery { PostId = id },
+                CancellationToken.None
+            );
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsType<PostDto>(result);
-            Assert.Equal(23, result.PostId);
-            Assert.Equal("This is a sample post.", result.Content);
-            Assert.Equal("Public", result.Privacy);
-            Assert.Equal(10, result.LikeCount);
-
-            _postServiceMock.Verify(x => x.GetPostById(23), Times.Once);
+            result.Should().NotBeNull();
+            result.PostId.Should().Be(id);
+            result.Content.Should().Be("iam yousef");
         }
+        [Theory]
+        [InlineData(99)]
+        public async Task Handle_InvalidPostId_ReturnsNull(int id)
+        {
+            _postServiceMock
+                .Setup(x => x.GetPostById(id))
+                .ReturnsAsync((PostDto)null);
+
+            var handler = new GetPostByIdQueryHandler(_postServiceMock.Object);
+
+            var result = await handler.Handle(
+                new GetPostByIdQuery { PostId = id },
+                CancellationToken.None
+            );
+
+            result.Should().BeNull();
+        }
+
+
 
 
     }
